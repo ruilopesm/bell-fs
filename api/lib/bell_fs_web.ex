@@ -1,12 +1,12 @@
-defmodule BellVaultWeb do
+defmodule BellFSWeb do
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, components, channels, and so on.
 
   This can be used in your application as:
 
-      use BellVaultWeb, :controller
-      use BellVaultWeb, :html
+      use BellFSWeb, :controller
+      use BellFSWeb, :html
 
   The definitions below will be executed for every controller,
   component, etc, so keep them short and clean, focused
@@ -39,7 +39,7 @@ defmodule BellVaultWeb do
     quote do
       use Phoenix.Controller,
         formats: [:html, :json],
-        layouts: [html: BellVaultWeb.Layouts]
+        layouts: [html: BellFSWeb.Layouts]
 
       import Plug.Conn
 
@@ -50,9 +50,9 @@ defmodule BellVaultWeb do
   def verified_routes do
     quote do
       use Phoenix.VerifiedRoutes,
-        endpoint: BellVaultWeb.Endpoint,
-        router: BellVaultWeb.Router,
-        statics: BellVaultWeb.static_paths()
+        endpoint: BellFSWeb.Endpoint,
+        router: BellFSWeb.Router,
+        statics: BellFSWeb.static_paths()
     end
   end
 

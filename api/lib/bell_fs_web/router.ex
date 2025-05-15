@@ -1,16 +1,16 @@
-defmodule BellVaultWeb.Router do
-  use BellVaultWeb, :router
+defmodule BellFSWeb.Router do
+  use BellFSWeb, :router
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
-  scope "/api", BellVaultWeb do
+  scope "/", BellFSWeb do
     pipe_through :api
   end
 
   # Enable LiveDashboard in development
-  if Application.compile_env(:bell_vault, :dev_routes) do
+  if Application.compile_env(:bell_fs, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put
     # it behind authentication and allow only admins to access it.
     # If your application does not have an admins-only section yet,
@@ -21,7 +21,7 @@ defmodule BellVaultWeb.Router do
     scope "/dev" do
       pipe_through [:fetch_session, :protect_from_forgery]
 
-      live_dashboard "/dashboard", metrics: BellVaultWeb.Telemetry
+      live_dashboard "/dashboard", metrics: BellFSWeb.Telemetry
     end
   end
 end

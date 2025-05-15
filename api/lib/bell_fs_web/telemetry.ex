@@ -1,4 +1,4 @@
-defmodule BellVaultWeb.Telemetry do
+defmodule BellFSWeb.Telemetry do
   use Supervisor
   import Telemetry.Metrics
 
@@ -53,23 +53,23 @@ defmodule BellVaultWeb.Telemetry do
       ),
 
       # Database Metrics
-      summary("bell_vault.repo.query.total_time",
+      summary("bell_fs.repo.query.total_time",
         unit: {:native, :millisecond},
         description: "The sum of the other measurements"
       ),
-      summary("bell_vault.repo.query.decode_time",
+      summary("bell_fs.repo.query.decode_time",
         unit: {:native, :millisecond},
         description: "The time spent decoding the data received from the database"
       ),
-      summary("bell_vault.repo.query.query_time",
+      summary("bell_fs.repo.query.query_time",
         unit: {:native, :millisecond},
         description: "The time spent executing the query"
       ),
-      summary("bell_vault.repo.query.queue_time",
+      summary("bell_fs.repo.query.queue_time",
         unit: {:native, :millisecond},
         description: "The time spent waiting for a database connection"
       ),
-      summary("bell_vault.repo.query.idle_time",
+      summary("bell_fs.repo.query.idle_time",
         unit: {:native, :millisecond},
         description:
           "The time the connection spent waiting before being checked out for the query"
@@ -87,7 +87,7 @@ defmodule BellVaultWeb.Telemetry do
     [
       # A module, function and arguments to be invoked periodically.
       # This function must call :telemetry.execute/3 and a metric must be added above.
-      # {BellVaultWeb, :count_users, []}
+      # {BellFSWeb, :count_users, []}
     ]
   end
 end

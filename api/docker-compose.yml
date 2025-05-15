@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:17-alpine
-    container_name: bell_vault_db
+    container_name: bell_fs_db
     env_file: .env.dev
     environment:
       POSTGRES_USER: ${DB_USERNAME:-postgres}

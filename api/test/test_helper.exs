@@ -1,2 +1,2 @@
 ExUnit.start()
-Ecto.Adapters.SQL.Sandbox.mode(BellVault.Repo, :manual)
+Ecto.Adapters.SQL.Sandbox.mode(BellFS.Repo, :manual)

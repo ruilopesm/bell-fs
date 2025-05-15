@@ -1,12 +1,12 @@
-defmodule BellVaultWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :bell_vault
+defmodule BellFSWeb.Endpoint do
+  use Phoenix.Endpoint, otp_app: :bell_fs
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
   @session_options [
     store: :cookie,
-    key: "_bell_vault_key",
+    key: "_bell_fs_key",
     signing_salt: "A25Bp5wl",
     same_site: "Lax"
   ]
@@ -21,15 +21,15 @@ defmodule BellVaultWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
-    from: :bell_vault,
+    from: :bell_fs,
     gzip: false,
-    only: BellVaultWeb.static_paths()
+    only: BellFSWeb.static_paths()
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
     plug Phoenix.CodeReloader
-    plug Phoenix.Ecto.CheckRepoStatus, otp_app: :bell_vault
+    plug Phoenix.Ecto.CheckRepoStatus, otp_app: :bell_fs
   end
 
   plug Phoenix.LiveDashboard.RequestLogger,
@@ -47,5 +47,5 @@ defmodule BellVaultWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug BellVaultWeb.Router
+  plug BellFSWeb.Router
 end

@@ -1,8 +1,8 @@
-defmodule BellVault.MixProject do
+defmodule BellFS.MixProject do
   use Mix.Project
 
-  @app :bell_vault
-  @description "Digital vault based on Bell-LaPadula enhanced model"
+  @app :bell_fs
+  @description "Filesystem based on Bell-LaPadula enhanced model"
   @version "0.1.0"
 
   def project do
@@ -23,7 +23,7 @@ defmodule BellVault.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {BellVault.Application, []},
+      mod: {BellFS.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -41,6 +41,11 @@ defmodule BellVault.MixProject do
       {:phoenix, "~> 1.7.21"},
       {:jason, "~> 1.2"},
       {:bandit, "~> 1.5"},
+
+      # authentication
+      {:argon2_elixir, "~> 4.0"},
+      {:guardian, "~> 2.3"},
+      {:guardian_db, "~> 3.0"},
 
       # database
       {:phoenix_ecto, "~> 4.5"},

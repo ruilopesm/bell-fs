@@ -7,19 +7,19 @@
 # General application configuration
 import Config
 
-config :bell_vault,
-  ecto_repos: [BellVault.Repo],
+config :bell_fs,
+  ecto_repos: [BellFS.Repo],
   generators: [timestamp_type: :utc_datetime, binary_id: true]
 
 # Configures the endpoint
-config :bell_vault, BellVaultWeb.Endpoint,
+config :bell_fs, BellFSWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [json: BellVaultWeb.ErrorJSON],
+    formats: [json: BellFSWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: BellVault.PubSub,
+  pubsub_server: BellFS.PubSub,
   live_view: [signing_salt: "p/WkG5Xa"]
 
 # Configures Elixir's Logger
