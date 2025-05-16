@@ -1,0 +1,48 @@
+File {
+    background: $boost;
+    height: 5;
+    margin: 1;
+    min-width: 50;
+    padding: 1;
+}
+
+FileForm, ManageForm {
+    align: center middle;
+    border: round white;
+    padding: 2 2;
+}
+
+.button-group {
+    align: right middle;
+}
+
+.button-of-group {
+    margin-left: 1;
+}
+
+.text-label {
+    height: 3;
+    border: round white;
+}
+
+#file-explorer {
+    border: solid white;
+    height: 15;
+}
+
+#compartment-select, #confidentialiy-select, #integrity-select {
+    border: none;
+    border: white;
+}
+
+#addFileButton, #saveManageButton {
+    margin-top: 1;
+    margin-right: 2;
+    width: 50%;
+}
+
+#cancelFileButton, #cancelManageButton {
+    margin-top: 1;
+    margin-left: 2;
+    width: 50%;
+}

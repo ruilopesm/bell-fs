@@ -4,6 +4,7 @@ from textual.reactive import reactive
 from textual.widgets import Tabs, Tab, Footer
 from screens.forms.login_form import LoginForm
 from screens.forms.register_form import RegisterForm
+from screens.blpfs import BLPFS
 
 
 class Auth(Screen):
@@ -35,6 +36,7 @@ class Auth(Screen):
 
     def on_login_form_login_success(self, message: LoginForm.LoginSuccess) -> None:
         self.notify('push do blpfs')
+        self.app.push_screen(BLPFS())
 
 
     def on_register_form_register_success(self, message: RegisterForm.RegisterSuccess) -> None:

@@ -25,25 +25,7 @@ Tabs {
     width: 100%;
 }
 
-#googleLogin, #googleRegister {
-    width: 100%;
-    border: white;
-    height: auto;
-    margin: 0;
-    padding: 0;
-}
-
-#googleLoginButton, #googleRegisterButton {
-    width: 50%;
-    margin-right: 1;
-}
-
-#confirmGoogleLoginButton, #confirmGoogleRegisterButton {
-    width: 50%;
-    margin-left: 1;
-}
-
 #cert-explorer {
-    height: 10;
+    height: 15;
     margin-bottom: 1;
 }

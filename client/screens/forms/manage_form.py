@@ -5,19 +5,11 @@ from textual.widgets import Button, DirectoryTree, Select
 from textual.containers import Horizontal
 
 
-class FileForm(Screen[str]):
-
-    current_filename = reactive(None)
+class ManageForm(Screen[str]):
 
     def compose(self) -> ComposeResult:
-        self.directory_tree = DirectoryTree('./', id='file-explorer')
-        self.add_btn = Button('Add File', id='addFileButton', variant='primary')
-        self.cancel_btn = Button('Cancel', id='cancelFileButton', variant='error')
-        yield self.directory_tree
-        yield Select(
-            id='compartment-select',
-            prompt='Compartment',
-            options=[(compartment, compartment) for compartment in ['minho', 'braga', 'porto']])
+        self.add_btn = Button('Add File', id='saveManageButton', variant='primary')
+        self.cancel_btn = Button('Cancel', id='cancelManageButton', variant='error')
         yield Select(
             id='confidentialiy-select',
             prompt='Confidentiality level',
@@ -30,15 +22,11 @@ class FileForm(Screen[str]):
             yield self.add_btn
             yield self.cancel_btn
 
-    def on_directory_tree_file_selected(self, message: DirectoryTree.FileSelected) -> None:
-        self.current_filename = str(message.path)
-        self.notify(self.current_filename, title='Selected file')
-
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == 'addFileButton':
+        if event.button.id == 'saveManageButton':
             if self.current_filename != None:
                 self.dismiss(self.current_filename)
             else:
                 self.notify('No file has been selected', title='Invalid file', severity='error')
-        elif event.button.id == 'cancelFileButton':
+        elif event.button.id == 'cancelManageButton':
             self.dismiss()
