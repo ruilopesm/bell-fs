@@ -60,5 +60,9 @@ config :logger, :console, format: "[$level] $message\n"
 # in production as building large stacktraces may be expensive.
 config :phoenix, :stacktrace_depth, 20
 
+config :bell_fs, BellFSWeb.Authentication.Guardian,
+  issuer: "bell_fs",
+  secret_key: "n9WzaknAPD16OgKaZ/iPLzorazXr3nnaCReNpSq3iCVJD0pCjVmCc6j7mKn6XHR3"
+
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime

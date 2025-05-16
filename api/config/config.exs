@@ -30,6 +30,12 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Configures GuardianDB for storing refresh tokens
+config :guardian, Guardian.DB,
+  repo: BellFS.Repo,
+  schema_name: "guardian_tokens",
+  token_types: ["refresh"]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

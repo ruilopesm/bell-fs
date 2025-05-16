@@ -63,6 +63,18 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
+    secret_key_guardian =
+      System.get_env("SECRET_KEY_GUARDIAN") ||
+        raise """
+        environment variable SECRET_KEY_GUARDIAN is missing.
+        You can generate one by calling: mix guardian.gen.secret
+        """
+
+    config :bell_fs, BellFSWeb.Authentication.Guardian,
+      issuer: "bell_fs",
+      secret_key: secret_key_guardian,
+      ttl: {14, :days}
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

@@ -43,6 +43,8 @@ defmodule BellFSWeb do
 
       import Plug.Conn
 
+      action_fallback BellFSWeb.FallbackController
+
       unquote(verified_routes())
     end
   end
