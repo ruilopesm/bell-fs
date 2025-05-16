@@ -2,6 +2,7 @@ defmodule BellFS.Security.UserCompartment do
   use BellFS, :schema
 
   alias BellFS.Accounts.User
+
   alias BellFS.Security.{
     Compartment,
     ConfidentialityLevel,

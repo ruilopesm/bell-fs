@@ -2,7 +2,7 @@ defmodule BellFSWeb.Plugs.SetCurrentUser do
   @moduledoc """
   This plug is meant to be used in conjunction with the `guardian`
   library, specifically its pipeline defined in the
-  `BellFSWeb.Plugs.EnsureAuthenticated` module.
+  `Guardian.Plug.EnsureAuthenticated` module.
 
   It sets the current user in the connection assigns, so that it can
   be accessed in the controllers and views.

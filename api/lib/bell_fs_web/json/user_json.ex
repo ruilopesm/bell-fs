@@ -10,7 +10,7 @@ defmodule BellFSWeb.UserJSON do
   def data(%User{} = user) do
     %{
       username: user.username,
-      certificate: user.certificate,
+      certificate: user.certificate
     }
   end
 end

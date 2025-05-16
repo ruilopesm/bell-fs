@@ -8,33 +8,33 @@ defmodule BellFS.Repo.Migrations.CreateUsersCompartments do
       add :trusted, :boolean, default: false, null: false
 
       add :username,
-        references(
-          :users,
-          column: :username,
-          on_delete: :nothing,
-          type: :string
-      )
+          references(
+            :users,
+            column: :username,
+            on_delete: :nothing,
+            type: :string
+          )
 
       add :compartment_id,
-        references(
-          :compartments,
-          on_delete: :nothing,
-          type: :binary_id
-      )
+          references(
+            :compartments,
+            on_delete: :nothing,
+            type: :binary_id
+          )
 
       add :confidentiality_id,
-        references(
-          :confidentiality_levels,
-          on_delete: :nothing,
-          type: :binary_id
-      )
+          references(
+            :confidentiality_levels,
+            on_delete: :nothing,
+            type: :binary_id
+          )
 
       add :integrity_id,
-        references(
-          :integrity_levels,
-          on_delete: :nothing,
-          type: :binary_id
-      )
+          references(
+            :integrity_levels,
+            on_delete: :nothing,
+            type: :binary_id
+          )
 
       timestamps(type: :utc_datetime)
     end

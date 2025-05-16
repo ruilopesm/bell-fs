@@ -61,5 +61,4 @@ defmodule BellFS.Accounts do
   Raises `Ecto.NoResultsError` if the user does not exist.
   """
   def get_user!(username), do: Repo.get!(User, username)
-
 end

@@ -18,10 +18,9 @@ defmodule BellFSWeb.Router do
 
     post "/refresh", AuthController, :refresh
 
-    pipe_through [:validate_access_token]
+    pipe_through :validate_access_token
 
     get "/me", AuthController, :me
-
   end
 
   # Enable LiveDashboard in development

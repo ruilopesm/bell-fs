@@ -7,11 +7,21 @@ meta {
 post {
   url: {{host}}/refresh
   body: json
-  auth: inherit
+  auth: none
 }
 
 body:json {
   {
     "refresh_token": "{{refresh_token}}"
   }
+}
+
+script:post-response {
+  if (res.getStatus() === 201) {
+    let data = res.getBody();
+    
+    bru.setEnvVar("access_token", data.access_token);
+    bru.setEnvVar("refresh_token", data.refresh_token);
+  }
+  
 }
