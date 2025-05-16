@@ -8,12 +8,13 @@ defmodule BellFSWeb.FallbackController do
 
   defguardp is_404(reason) when reason in [:not_found, :invalid_credentials]
 
-  defguardp is_401(reason) when reason in [
-    :unauthorized,
-    :token_not_found,
-    :invalid_token,
-    :token_expired
-  ]
+  defguardp is_401(reason)
+            when reason in [
+                   :unauthorized,
+                   :token_not_found,
+                   :invalid_token,
+                   :token_expired
+                 ]
 
   # This clause handles errors returned by Ecto's insert/update/delete.
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do

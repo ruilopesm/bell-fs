@@ -5,8 +5,22 @@ defmodule BellFSWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :validate_access_token do
+    plug BellFSWeb.Plugs.ValidateAccessToken
+  end
+
   scope "/", BellFSWeb do
     pipe_through :api
+
+    post "/login", AuthController, :login
+    post "/register", AuthController, :register
+    post "/logout", AuthController, :logout
+
+    post "/refresh", AuthController, :refresh
+
+    pipe_through :validate_access_token
+
+    get "/me", AuthController, :me
   end
 
   # Enable LiveDashboard in development

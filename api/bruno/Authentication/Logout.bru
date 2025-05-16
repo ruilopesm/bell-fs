@@ -1,0 +1,16 @@
+meta {
+  name: Logout
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{host}}/logout
+  body: json
+}
+
+body:json {
+  {
+    "refresh_token": "{{refresh_token}}"
+  }
+}
