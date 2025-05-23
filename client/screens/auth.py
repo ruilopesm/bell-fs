@@ -35,7 +35,6 @@ class Auth(Screen):
 
 
     def on_login_form_login_success(self, message: LoginForm.LoginSuccess) -> None:
-        self.notify('push do blpfs')
         self.app.push_screen(BLPFS())
 
 

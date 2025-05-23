@@ -73,7 +73,7 @@ class BLPFS(Screen):
                 try:
                     return await func(self, *args, **kwargs)
                 except UnauthorizedAccessException:
-                    self.notify(traceback.format_exc(), title='Unauthorized Access', markup=False)
+                    self.notify(traceback.format_exc(), title='Unauthorized Access', severity='error', markup=False)
                     self.app.pop_screen()
                 except Exception:
                     self.notify(traceback.format_exc(), title=error_title, severity='error', markup=False)
@@ -130,13 +130,11 @@ class BLPFS(Screen):
         await self.load_blpfs()
 
 
-    @safe_api_callback('Logout Failed')
+    @safe_api_callback('Failed Logout')
     async def handle_logout(self) -> None:
-        response = await self.app.api.logout()
-        if response.status_code != 204:
-            raise Exception(json.dumps(response.json()))
+        await self.app.api.logout()
         self.app.pop_screen()
-        self.notify('Login again to access vault', title='Successful Logout')
+        self.notify('Login again to access BLP file system', title='Successful Logout')
 
 
     @safe_api_callback('Load Directory Failed')

@@ -1,5 +1,3 @@
-from json import dumps
-import traceback
 from textual.app import ComposeResult
 from textual.widgets import Input, Button, Static
 from textual.message import Message
@@ -25,8 +23,7 @@ class LoginForm(Static):
 
     async def handle_login(self) -> None:
         try:
-            self.notify(str(self.username.value), markup=False)
-            self.notify(str(self.password.value), markup=False)
+            await self.app.api.login(self.username.value, self.password.value)
             self.post_message(self.LoginSuccess())
         except Exception as e:
-            self.notify(traceback.format_exc(), title='Login Failed', markup=False, severity='error')
+            self.notify(str(e), title='Failed Login', markup=False, severity='error')

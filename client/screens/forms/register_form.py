@@ -1,5 +1,3 @@
-from json import dumps
-import traceback
 from textual.reactive import reactive
 from textual.message import Message
 from textual.app import ComposeResult
@@ -34,10 +32,12 @@ class RegisterForm(Static):
   
     async def handle_register(self):
         try:
-            self.notify(str(self.certificate_path))
-            self.notify(str(self.username.value))
-            self.notify(str(self.password.value))
+            await self.app.api.register(
+                self.username.value,
+                self.password.value,
+                self.certificate_path
+            )
             self.post_message(self.RegisterSuccess())
-            self.notify('Login to access the vault', title='Registration Completed')
+            self.notify('Login to access BLP file system', title='Successful Registration')
         except Exception as e:
-            self.notify(traceback.format_exc(), title='Register Failed', markup=False, severity='error')
+            self.notify(str(e), title='Failed Registration', markup=False, severity='error')
