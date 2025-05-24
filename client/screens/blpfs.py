@@ -1,7 +1,5 @@
 import json
-import traceback
-import functools
-from typing import Callable, Coroutine
+from api.decorators import safe_api_callback
 from textual.screen import Screen
 from textual.widgets import Footer
 from textual.reactive import reactive
@@ -11,7 +9,6 @@ from screens.text.editor import EditorScreen
 from screens.forms.file_form import FileForm
 from screens.resources.file import File
 from screens.forms.manage_form  import ManageForm
-from api.exceptions import UnauthorizedAccessException
 
 
 class BLPFS(Screen):
@@ -19,7 +16,8 @@ class BLPFS(Screen):
     CSS_PATH = '../style/blpfs.tcss'
     BINDINGS = [
         ('a', 'add_file', 'add file'),
-        ('q', 'logout', 'logout')
+        ('q', 'logout', 'logout'),
+        ('m', 'me', 'me'),
     ]
 
     current_directory = reactive(None)
@@ -39,6 +37,9 @@ class BLPFS(Screen):
 
     async def action_logout(self) -> None:
         self.run_worker(self.handle_logout(), exclusive=True)
+
+    async def action_me(self) -> None:
+        self.run_worker(self.handle_me(), exclusive=True)
 
 
     async def action_add_file(self) -> None:
@@ -64,21 +65,6 @@ class BLPFS(Screen):
 
     async def on_file_delete(self, message: File.Delete) -> None:
         self.run_worker(self.handle_file_delete(message.resource_id), exclusive=True)
-
-
-    def safe_api_callback(error_title: str = 'API Error'):
-        def decorator(func: Callable[..., Coroutine]):
-            @functools.wraps(func)
-            async def wrapper(self, *args, **kwargs):
-                try:
-                    return await func(self, *args, **kwargs)
-                except UnauthorizedAccessException:
-                    self.notify(traceback.format_exc(), title='Unauthorized Access', severity='error', markup=False)
-                    self.app.pop_screen()
-                except Exception:
-                    self.notify(traceback.format_exc(), title=error_title, severity='error', markup=False)
-            return wrapper
-        return decorator
 
 
     @safe_api_callback('File Register Failed')
@@ -135,6 +121,12 @@ class BLPFS(Screen):
         await self.app.api.logout()
         self.app.pop_screen()
         self.notify('Login again to access BLP file system', title='Successful Logout')
+
+
+    @safe_api_callback('Failed get ME')
+    async def handle_me(self) -> None:
+        response = await self.app.api.me()
+        self.notify(json.dumps(response.json()), markup=False)
 
 
     @safe_api_callback('Load Directory Failed')

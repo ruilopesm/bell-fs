@@ -1,5 +1,5 @@
 import httpx
-from api.decorators import auth_api_call
+from api.decorators import api_call
 from crypto.certificate import serialize_ceritifcate_to_base64, certificate_load
 
 
@@ -11,7 +11,7 @@ class AsyncAuthAPIClient:
         self.refresh_token = None
         self.auth_client = httpx.AsyncClient(base_url=base_url)
 
-    @auth_api_call(expected_status=201)
+    @api_call(expected_status=201, method='post')
     async def _register(self, username, password, certificate):
         return '/register', {
             'user': {
@@ -22,20 +22,20 @@ class AsyncAuthAPIClient:
             }
         }
 
-    @auth_api_call(expected_status=200)
+    @api_call(expected_status=200, method='post')
     async def _login(self, username, password):
         return '/login', {
             'username': username,
             'password': password,
         }
 
-    @auth_api_call(expected_status=204)
+    @api_call(expected_status=204, method='post')
     async def _logout(self):
         return '/logout', {
             'refresh_token': self.refresh_token,
         }
 
-    @auth_api_call(expected_status=201)
+    @api_call(expected_status=201, method='post')
     async def _refresh(self):
         return '/refresh', {
             'refresh_token': self.refresh_token,
