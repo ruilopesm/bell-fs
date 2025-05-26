@@ -23,7 +23,10 @@ class LoginForm(Static):
 
     async def handle_login(self) -> None:
         try:
-            await self.app.api.login('diogo', 'portugal1234')
+            await self.app.api.login(
+                self.username.value,
+                self.password.value
+            )
             self.post_message(self.LoginSuccess())
         except Exception as e:
             self.notify(str(e), title='Failed Login', markup=False, severity='error')

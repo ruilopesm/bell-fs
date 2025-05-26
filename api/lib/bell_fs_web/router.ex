@@ -21,6 +21,8 @@ defmodule BellFSWeb.Router do
     pipe_through :validate_access_token
 
     get "/me", AuthController, :me
+
+    get "/users/:username/certificate", UserController, :certificate
   end
 
   # Enable LiveDashboard in development
