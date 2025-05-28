@@ -116,4 +116,25 @@ defmodule BellFS.Structure do
     |> Repo.update()
     |> Repo.preload_after_mutation(File.preloads())
   end
+
+  @doc """
+  Only trusted users that meet the requirements can delete a file.
+
+  1. There's a `users_compartments` entry for the user where `trusted` is `true`.
+  2. The file's confidentiality <= user's confidentiality level on such compartment.
+  3. The file's integrity <= user's integrity level on such compartment.
+  """
+  def can_delete_file?(%User{username: username} = _current_user, id) do
+    File
+    |> join(:inner, [f], uc in UserCompartment, on: f.compartment_id == uc.compartment_id)
+    |> join(:inner, [f, uc], uco in Confidentiality, on: uc.confidentiality_id == uco.id)
+    |> join(:inner, [f, uc, uco], uin in Integrity, on: uc.integrity_id == uin.id)
+    |> join(:inner, [f, uc, uco, uin], fco in Confidentiality, on: f.confidentiality_id == fco.id)
+    |> join(:inner, [f, uc, uco, uin, fco], fin in Integrity, on: f.integrity_id == fin.id)
+    |> where([f, uc, uco, uin, fco, fin], uc.username == ^username and f.id == ^id)
+    |> where([f, uc, uco, uin, fco, fin], uc.trusted == true and fco.level <= uco.level and fin.level <= uin.level)
+    |> Repo.exists?()
+  end
+
+  def delete_file(%File{} = file), do: Repo.delete(file)
 end

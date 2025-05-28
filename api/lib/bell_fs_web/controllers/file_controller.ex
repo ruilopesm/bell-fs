@@ -77,4 +77,19 @@ defmodule BellFSWeb.FileController do
       forbidden(conn)
     end
   end
+
+  def delete(conn, %{"id" => id}) do
+    current_user = conn.assigns.current_user
+    can_delete? = Structure.can_delete_file?(current_user, id)
+
+    if can_delete? do
+      file = Structure.get_file!(id)
+
+      with {:ok, %File{}} <- Structure.delete_file(file) do
+        send_resp(conn, :no_content, "")
+      end
+    else
+      forbidden(conn)
+    end
+  end
 end
