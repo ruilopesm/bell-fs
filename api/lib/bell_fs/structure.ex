@@ -18,11 +18,16 @@ defmodule BellFS.Structure do
   Lists the files that a given user has access to.
   """
   def list_files(%User{} = current_user) do
-    current_user
-    |> scoped_query(:read)
-    |> select([f, uc, uco, uin, fco, fin], f)
-    |> Repo.all()
-    |> Repo.preload(File.preloads())
+    rows =
+      current_user
+      |> scoped_query(:read)
+      |> select([f, uc, uco, uin, fco, fin], {f, uc})
+      |> Repo.all()
+
+    Enum.map(rows, fn {file, uc} ->
+      file = Repo.preload(file, File.preloads())
+      %{file: file, trusted: uc.trusted}
+    end)
   end
 
   @doc """

@@ -9,11 +9,11 @@ defmodule BellFSWeb.FileJSON do
     %{files: for(file <- files, do: lazy(file))}
   end
 
-  def show(%{file: %File{} = file}) do
+  def show(%{file: file}) do
     %{file: data(file)}
   end
 
-  def read(%{file: %File{} = file}) do
+  def read(%{file: file}) do
     data = data(file) |> Map.drop([:confidentiality, :integrity])
     %{file: data}
   end
@@ -31,10 +31,11 @@ defmodule BellFSWeb.FileJSON do
     }
   end
 
-  def lazy(%File{} = file) do
+  def lazy(%{file: file, trusted: trusted}) do
     %{
       id: file.id,
       name: file.name,
+      trusted: trusted,
       confidentiality: LevelJSON.data(file.confidentiality),
       integrity: LevelJSON.data(file.integrity)
     }
