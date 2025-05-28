@@ -13,6 +13,7 @@ defmodule BellFS.Security.UserCompartment do
   @foreign_key_type :binary_id
 
   @required_fields ~w(
+    trusted
     username
     compartment_id
     confidentiality_id
@@ -40,7 +41,6 @@ defmodule BellFS.Security.UserCompartment do
     user_compartment
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
-    |> validate_required([:trusted])
     |> foreign_key_constraint(:username)
     |> foreign_key_constraint(:compartment_id)
     |> unique_constraint(

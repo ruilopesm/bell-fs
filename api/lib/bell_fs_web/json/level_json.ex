@@ -20,7 +20,6 @@ def show(%{integrity: integrity}) do
 
   def data(%Confidentiality{} = confidentiality) do
     %{
-      id: confidentiality.id,
       name: confidentiality.name,
       level: confidentiality.level
     }
@@ -28,7 +27,6 @@ def show(%{integrity: integrity}) do
 
   def data(%Integrity{} = integrity) do
     %{
-      id: integrity.id,
       name: integrity.name,
       level: integrity.level
     }

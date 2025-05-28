@@ -16,7 +16,7 @@ defmodule BellFSWeb.FileJSON do
     %{
       name: file.name,
       confidentiality: LevelJSON.data(confidentiality),
-      integrity: LevelJSON.data(integrity),
+      integrity: LevelJSON.data(integrity)
     }
   end
 end

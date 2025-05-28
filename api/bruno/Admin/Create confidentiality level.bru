@@ -24,6 +24,6 @@ script:post-response {
     let data = res.getBody();
     let confidentiality = data.confidentiality;
     
-    bru.setEnvVar("confidentiality_id", confidentiality.id);
+    bru.setEnvVar("confidentiality_name", confidentiality.name);
   }
 }

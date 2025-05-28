@@ -24,6 +24,6 @@ script:post-response {
     let data = res.getBody();
     let integrity = data.integrity;
     
-    bru.setEnvVar("integrity_id", integrity.id);
+    bru.setEnvVar("integrity_name", integrity.name);
   }
 }

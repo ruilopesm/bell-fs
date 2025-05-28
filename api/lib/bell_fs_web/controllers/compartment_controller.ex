@@ -1,9 +1,8 @@
 defmodule BellFSWeb.CompartmentController do
   use BellFSWeb, :controller
 
-  alias BellFS.Security.UserCompartment
   alias BellFS.Security
-  alias BellFS.Security.Compartment
+  alias BellFS.Security.{Compartment, UserCompartment}
 
   def create(conn, %{"compartment" => params}) do
     with {:ok, %Compartment{} = compartment} <- Security.create_compartment(params) do
@@ -14,8 +13,14 @@ defmodule BellFSWeb.CompartmentController do
   end
 
   def add_user(conn, %{"id" => id, "username" => username, "user" => params}) do
-    params = Map.put(params, "compartment_id", id)
     params = Map.put(params, "username", username)
+    params = Map.put(params, "compartment_id", id)
+
+    confidentiality = Security.get_confidentiality_by_name!(params["confidentiality"])
+    params = Map.put(params, "confidentiality_id", confidentiality.id)
+
+    integrity = Security.get_integrity_by_name!(params["integrity"])
+    params = Map.put(params, "integrity_id", integrity.id)
 
     with {:ok, %UserCompartment{} = user_compartment} <- Security.add_user_to_compartment(params) do
       conn

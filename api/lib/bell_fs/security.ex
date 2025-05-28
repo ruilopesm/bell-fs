@@ -12,6 +12,8 @@ defmodule BellFS.Security do
 
   ### Compartments
 
+  def get_compartment!(id), do: Repo.get!(Compartment, id)
+
   def create_compartment(attrs) do
     %Compartment{}
     |> Compartment.changeset(attrs)
@@ -49,6 +51,12 @@ defmodule BellFS.Security do
     |> Repo.all()
   end
 
+  def get_confidentiality_by_name!(name) do
+    Confidentiality
+    |> where([c], c.name == ^name)
+    |> Repo.one!()
+  end
+
   def create_confidentiality(attrs \\ %{}) do
     %Confidentiality{}
     |> Confidentiality.changeset(attrs)
@@ -59,6 +67,12 @@ defmodule BellFS.Security do
     Integrity
     |> order_by([i], i.level)
     |> Repo.all()
+  end
+
+  def get_integrity_by_name!(name) do
+    Integrity
+    |> where([i], i.name == ^name)
+    |> Repo.one!()
   end
 
   def create_integrity(attrs \\ %{}) do
