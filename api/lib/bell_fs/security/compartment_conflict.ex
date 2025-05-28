@@ -6,7 +6,7 @@ defmodule BellFS.Security.CompartmentConflict do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
-  @required_fields ~w()a
+  @required_fields ~w(compartment_a_id compartment_b_id)a
   @optional_fields ~w()a
 
   schema "compartment_conflicts" do
@@ -21,5 +21,7 @@ defmodule BellFS.Security.CompartmentConflict do
     compartment_conflict
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+    |> foreign_key_constraint(:compartment_a_id)
+    |> foreign_key_constraint(:compartment_b_id)
   end
 end

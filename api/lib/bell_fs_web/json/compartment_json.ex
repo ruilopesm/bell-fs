@@ -3,6 +3,7 @@ defmodule BellFSWeb.CompartmentJSON do
 
   alias BellFS.Security.{
     Compartment,
+    CompartmentConflict,
     Confidentiality,
     Integrity,
     UserCompartment
@@ -15,6 +16,10 @@ defmodule BellFSWeb.CompartmentJSON do
 
   def show(%{user_compartment: user_compartment}) do
     %{user_compartment: data(user_compartment)}
+  end
+
+  def show(%{compartment_conflict: compartment_conflict}) do
+    %{compartment_conflict: data(compartment_conflict)}
   end
 
   def data(%Compartment{} = compartment) do
@@ -35,6 +40,14 @@ defmodule BellFSWeb.CompartmentJSON do
       trusted: user_compartment.trusted,
       confidentiality: LevelJSON.data(confidentiality),
       integrity: LevelJSON.data(integrity),
+    }
+  end
+
+  def data(%CompartmentConflict{} = compartment_conflict) do
+    %{
+      id: compartment_conflict.id,
+      compartment_a_id: compartment_conflict.compartment_a_id,
+      compartment_b_id: compartment_conflict.compartment_b_id
     }
   end
 end

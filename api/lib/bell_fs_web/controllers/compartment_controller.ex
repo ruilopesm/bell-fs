@@ -1,6 +1,7 @@
 defmodule BellFSWeb.CompartmentController do
   use BellFSWeb, :controller
 
+  alias BellFS.Security.CompartmentConflict
   alias BellFS.Security
   alias BellFS.Security.{Compartment, UserCompartment}
 
@@ -32,6 +33,17 @@ defmodule BellFSWeb.CompartmentController do
   def remove_user(conn, %{"id" => id, "username" => username}) do
     with {:ok, %UserCompartment{} = _deleted} <- Security.remove_user_from_compartment(id, username) do
       send_resp(conn, :no_content, "")
+    end
+  end
+
+  def add_conflict(conn, %{"conflict" => params}) do
+
+    compartment_a = Security.get_compartment_by_name!(params["compartment_a_name"])
+    compartment_b = Security.get_compartment_by_name!(params["compartment_b_name"])
+    with {:ok, %CompartmentConflict{} = conflict} <- Security.create_compartment_conflict(%{compartment_a_id: compartment_a.id, compartment_b_id: compartment_b.id}) do
+      conn
+      |> put_status(:created)
+      |> render(:show, compartment_conflict: conflict)
     end
   end
 end

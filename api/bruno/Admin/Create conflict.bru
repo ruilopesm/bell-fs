@@ -1,0 +1,24 @@
+meta {
+  name: Create conflict
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{host}}/compartments/conflict
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "conflict": {
+      "compartment_a_name": "Universidade do Minho",
+      "compartment_b_name": "Universidade do Porto" 
+    }
+  }
+}

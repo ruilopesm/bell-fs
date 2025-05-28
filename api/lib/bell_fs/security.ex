@@ -5,6 +5,7 @@ defmodule BellFS.Security do
 
   alias BellFS.Security.{
     Compartment,
+    CompartmentConflict,
     Confidentiality,
     Integrity,
     UserCompartment
@@ -13,6 +14,12 @@ defmodule BellFS.Security do
   ### Compartments
 
   def get_compartment!(id), do: Repo.get!(Compartment, id)
+
+  def get_compartment_by_name!(name) do
+    Compartment
+    |> where([c], c.name == ^name)
+    |> Repo.one!()
+  end
 
   def create_compartment(attrs) do
     %Compartment{}
@@ -78,6 +85,12 @@ defmodule BellFS.Security do
   def create_integrity(attrs \\ %{}) do
     %Integrity{}
     |> Integrity.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def create_compartment_conflict(attrs \\ %{}) do
+    %CompartmentConflict{}
+    |> CompartmentConflict.changeset(attrs)
     |> Repo.insert()
   end
 end

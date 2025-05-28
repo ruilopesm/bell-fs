@@ -37,6 +37,8 @@ defmodule BellFSWeb.Router do
 
       put "/:id/:username", CompartmentController, :add_user
       delete "/:id/:username", CompartmentController, :remove_user
+
+      post "/conflict", CompartmentController, :add_conflict
     end
 
     scope "/levels" do
