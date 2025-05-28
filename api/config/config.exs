@@ -36,12 +36,6 @@ config :guardian, Guardian.DB,
   schema_name: "guardian_tokens",
   token_types: ["refresh"]
 
-# Configures Waffle for file uploads
-config :waffle,
-  storage: Waffle.Storage.Local,
-  storage_dir_prefix: "priv",
-  asset_host: {:system, "HOST_URL"}
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

@@ -1,6 +1,7 @@
 defmodule BellFSWeb.FileController do
   use BellFSWeb, :controller
 
+  alias BellFS.Security
   alias BellFS.Structure
   alias BellFS.Structure.File
 
@@ -14,16 +15,25 @@ defmodule BellFSWeb.FileController do
   end
 
   def create(conn, %{"file" => params}) do
+    attrs = %{}
+
+    compartment = Security.get_compartment_by_name!(params["compartment"])
+    attrs = Map.put(attrs, "compartment_id", compartment.id)
+
+    confidentiality = Security.get_confidentiality_by_name!(params["confidentiality"])
+    attrs = Map.put(attrs, "confidentiality_id", confidentiality.id)
+
+    integrity = Security.get_integrity_by_name!(params["integrity"])
+    attrs = Map.put(attrs, "integrity_id", integrity.id)
+
     current_user = conn.assigns.current_user
+    can_create? = Structure.can_create_file?(current_user, attrs)
 
-    attrs = %{
-      "compartment_id" => params["compartment_id"],
-      "confidentiality_id" => params["confidentiality_id"],
-      "integrity_id" => params["integrity_id"]
-    }
+    if can_create? do
+      attrs = Map.put(attrs, "name", params["name"])
+      attrs = Map.put(attrs, "content", params["content"])
 
-    if Structure.can_create_file?(current_user, attrs) do
-      with {:ok, %File{} = file} <- Structure.create_file(params) do
+      with {:ok, %File{} = file} <- Structure.create_file(attrs) do
         conn
         |> put_status(:created)
         |> render(:show, file: file)
@@ -31,12 +41,5 @@ defmodule BellFSWeb.FileController do
     else
       forbidden(conn)
     end
-  end
-
-  defp forbidden(conn) do
-    conn
-    |> put_status(:forbidden)
-    |> put_view(BellFSWeb.ErrorJSON)
-    |> render(:"403")
   end
 end

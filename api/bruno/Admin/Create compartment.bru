@@ -24,5 +24,6 @@ script:post-response {
     let compartment = data.compartment;
     
     bru.setEnvVar("compartment_id", compartment.id);
+    bru.setEnvVar("compartment_name", compartment.name);
   }
 }

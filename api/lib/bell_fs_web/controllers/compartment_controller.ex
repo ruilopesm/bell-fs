@@ -13,16 +13,17 @@ defmodule BellFSWeb.CompartmentController do
   end
 
   def add_user(conn, %{"id" => id, "username" => username, "user" => params}) do
-    params = Map.put(params, "username", username)
-    params = Map.put(params, "compartment_id", id)
+    attrs = %{}
+    attrs = Map.put(attrs, "username", username)
+    attrs = Map.put(attrs, "compartment_id", id)
 
     confidentiality = Security.get_confidentiality_by_name!(params["confidentiality"])
-    params = Map.put(params, "confidentiality_id", confidentiality.id)
+    attrs = Map.put(attrs, "confidentiality_id", confidentiality.id)
 
     integrity = Security.get_integrity_by_name!(params["integrity"])
-    params = Map.put(params, "integrity_id", integrity.id)
+    attrs = Map.put(attrs, "integrity_id", integrity.id)
 
-    with {:ok, %UserCompartment{} = user_compartment} <- Security.add_user_to_compartment(params) do
+    with {:ok, %UserCompartment{} = user_compartment} <- Security.add_user_to_compartment(attrs) do
       conn
       |> put_status(:created)
       |> render(:show, user_compartment: user_compartment)

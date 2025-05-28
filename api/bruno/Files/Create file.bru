@@ -6,12 +6,18 @@ meta {
 
 post {
   url: {{host}}/files
-  body: multipartForm
+  body: json
   auth: inherit
 }
 
-body:multipart-form {
-  confidentiality: {{confidentiality_name}} @contentType(string)
-  integrity: {{integrity_name}} @contentType(string)
-  persistent: @file(/home/rui/dotfiles/README.md)
+body:json {
+  {
+    "file": {
+      "name": "README.md",
+      "content": "Conteúdo muito fixe",
+      "compartment": "{{compartment_name}}",
+      "confidentiality": "{{confidentiality_name}}",
+      "integrity": "{{integrity_name}}"
+    }
+  }
 }

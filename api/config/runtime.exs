@@ -74,17 +74,6 @@ if config_env() in [:prod] do
     issuer: "bell_fs",
     secret_key: secret_key_guardian
 
-  host_url =
-    System.get_env("HOST_URL") ||
-      raise """
-      environment variable HOST_URL is missing.
-      Setup the URL where you are hosting the server.
-      """
-
-  config :waffle,
-    storage: Waffle.Storage.Local,
-    asset_host: host_url
-
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

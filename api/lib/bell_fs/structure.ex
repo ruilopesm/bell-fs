@@ -32,6 +32,7 @@ defmodule BellFS.Structure do
     |> where([f, uc, uco, uin, fco, fin], fco.level <= uco.level and fin.level >= uin.level)
     |> select([f, uc, uco, uin, fco, fin], f)
     |> Repo.all()
+    |> Repo.preload(File.preloads())
   end
 
   @doc """
@@ -55,6 +56,7 @@ defmodule BellFS.Structure do
     |> where([uc, uco, uin, fco, fin], uc.username == ^username)
     |> where([uc, uco, uin, fco, fin], fco.level >= uco.level and fin.level <= uin.level)
     |> Repo.exists?()
+    |> dbg()
   end
 
   @doc """
@@ -67,5 +69,6 @@ defmodule BellFS.Structure do
     %File{}
     |> File.changeset(attrs)
     |> Repo.insert()
+    |> Repo.preload_after_insert(File.preloads())
   end
 end

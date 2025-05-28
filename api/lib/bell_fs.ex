@@ -21,7 +21,6 @@ defmodule BellFS do
   def schema do
     quote do
       use Ecto.Schema
-      use Waffle.Ecto.Schema
 
       import Ecto.Changeset
     end
