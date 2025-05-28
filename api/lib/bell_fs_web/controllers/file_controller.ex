@@ -14,6 +14,21 @@ defmodule BellFSWeb.FileController do
     |> render(:index, files: files)
   end
 
+  def show(conn, %{"id" => id}) do
+    current_user = conn.assigns.current_user
+    can_read? = Structure.can_read_file?(current_user, id)
+
+    if can_read? do
+      file = Structure.get_file!(id)
+
+      conn
+      |> put_status(:ok)
+      |> render(:read, file: file)
+    else
+      forbidden(conn)
+    end
+  end
+
   def create(conn, %{"file" => params}) do
     attrs = %{}
 

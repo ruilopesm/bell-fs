@@ -21,3 +21,13 @@ body:json {
     }
   }
 }
+
+script:post-response {
+  if (res.getStatus() === 201) {
+    let data = res.getBody();
+    let file = data.file;
+    
+    bru.setEnvVar("file_id", file.id);
+  }
+  
+}

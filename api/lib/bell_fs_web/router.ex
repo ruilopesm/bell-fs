@@ -27,6 +27,7 @@ defmodule BellFSWeb.Router do
 
     scope "/files" do
       get "/", FileController, :index
+      get "/:id", FileController, :show
       post "/", FileController, :create
     end
 

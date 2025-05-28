@@ -56,7 +56,6 @@ defmodule BellFS.Structure do
     |> where([uc, uco, uin, fco, fin], uc.username == ^username)
     |> where([uc, uco, uin, fco, fin], fco.level >= uco.level and fin.level <= uin.level)
     |> Repo.exists?()
-    |> dbg()
   end
 
   @doc """
@@ -70,5 +69,30 @@ defmodule BellFS.Structure do
     |> File.changeset(attrs)
     |> Repo.insert()
     |> Repo.preload_after_insert(File.preloads())
+  end
+
+  @doc """
+  A user is said to be able to read a file if:
+
+  1. There's a `users_compartments` entry for the user.
+  2. The file's confidentiality <= user's confidentiality level on such compartment.
+  3. The file's integrity >= user's integrity level on such compartment.
+  """
+  def can_read_file?(%User{username: username} = _current_user, id) do
+    File
+    |> join(:inner, [f], uc in UserCompartment, on: f.compartment_id == uc.compartment_id)
+    |> join(:inner, [f, uc], uco in Confidentiality, on: uc.confidentiality_id == uco.id)
+    |> join(:inner, [f, uc, uco], uin in Integrity, on: uc.integrity_id == uin.id)
+    |> join(:inner, [f, uc, uco, uin], fco in Confidentiality, on: f.confidentiality_id == fco.id)
+    |> join(:inner, [f, uc, uco, uin, fco], fin in Integrity, on: f.integrity_id == fin.id)
+    |> where([f, uc, uco, uin, fco, fin], uc.username == ^username and f.id == ^id)
+    |> where([f, uc, uco, uin, fco, fin], fco.level <= uco.level and fin.level >= uin.level)
+    |> Repo.exists?()
+  end
+
+  def get_file!(id) do
+    File
+    |> Repo.get!(id)
+    |> Repo.preload(File.preloads())
   end
 end
