@@ -59,16 +59,15 @@ defmodule BellFS.Structure do
   end
 
   @doc """
-  Creates a file.
+  Creates a file, by returning `{:ok, %File{}}` on success, or `{:error, changeset}` on failure.
 
   Assumes the user has already been checked for permissions.
-  Returns `{:ok, %File{}}` on success, or `{:error, changeset}` on failure.
   """
   def create_file(attrs \\ %{}) do
     %File{}
     |> File.changeset(attrs)
     |> Repo.insert()
-    |> Repo.preload_after_insert(File.preloads())
+    |> Repo.preload_after_mutation(File.preloads())
   end
 
   @doc """
@@ -90,9 +89,31 @@ defmodule BellFS.Structure do
     |> Repo.exists?()
   end
 
+  @doc """
+  Gets a file by its id, raising `Ecto.NoResultsError` if not found.
+
+  Assumes the user has already been checked for permissions.
+  """
   def get_file!(id) do
     File
     |> Repo.get!(id)
     |> Repo.preload(File.preloads())
+  end
+
+  @doc """
+  Same checks as `can_read_file?/2`, but for updating a file.
+  """
+  def can_update_file?(%User{} = current_user, id), do: can_read_file?(current_user, id)
+
+  @doc """
+  Updates a file, by returning `{:ok, %File{}}` on success, or `{:error, changeset}` on failure.
+
+  Assumes the user has already been checked for permissions.
+  """
+  def update_file(%File{} = file, attrs) do
+    file
+    |> File.changeset(attrs)
+    |> Repo.update()
+    |> Repo.preload_after_mutation(File.preloads())
   end
 end

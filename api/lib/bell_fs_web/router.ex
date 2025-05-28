@@ -29,6 +29,7 @@ defmodule BellFSWeb.Router do
       get "/", FileController, :index
       get "/:id", FileController, :show
       post "/", FileController, :create
+      put "/:id", FileController, :update
     end
 
     ## Admin

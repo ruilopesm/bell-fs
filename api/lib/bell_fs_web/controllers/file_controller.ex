@@ -57,4 +57,24 @@ defmodule BellFSWeb.FileController do
       forbidden(conn)
     end
   end
+
+  def update(conn, %{"id" => id, "file" => params}) do
+    editable_fields = File.editable_fields() |> Enum.map(&Atom.to_string/1)
+    params = Map.take(params, editable_fields)
+
+    current_user = conn.assigns.current_user
+    can_update? = Structure.can_update_file?(current_user, id)
+
+    if can_update? do
+      file = Structure.get_file!(id)
+
+      with {:ok, %File{} = file} <- Structure.update_file(file, params) do
+        conn
+        |> put_status(:ok)
+        |> render(:show, file: file)
+      end
+    else
+      forbidden(conn)
+    end
+  end
 end

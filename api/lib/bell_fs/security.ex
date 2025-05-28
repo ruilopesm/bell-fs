@@ -38,7 +38,7 @@ defmodule BellFS.Security do
     %UserCompartment{}
     |> UserCompartment.changeset(attrs)
     |> Repo.insert()
-    |> Repo.preload_after_insert(UserCompartment.preloads())
+    |> Repo.preload_after_mutation(UserCompartment.preloads())
   end
 
   def remove_user_from_compartment(compartment_id, username) do

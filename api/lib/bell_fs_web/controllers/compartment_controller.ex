@@ -14,6 +14,7 @@ defmodule BellFSWeb.CompartmentController do
 
   def add_user(conn, %{"id" => id, "username" => username, "user" => params}) do
     attrs = %{}
+
     attrs = Map.put(attrs, "username", username)
     attrs = Map.put(attrs, "compartment_id", id)
 

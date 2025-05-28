@@ -18,6 +18,7 @@ defmodule BellFS.Structure.File do
     integrity_id
   )a
   @optional_fields ~w()a
+  @editable_fields ~w(name content)a
 
   schema "files" do
     field :name, :string
@@ -40,6 +41,8 @@ defmodule BellFS.Structure.File do
     |> foreign_key_constraint(:integrity_id)
     |> unique_constraint(:name, name: :unique_file_per_compartment)
   end
+
+  def editable_fields, do: @editable_fields
 
   def preloads, do: [
     :compartment,
