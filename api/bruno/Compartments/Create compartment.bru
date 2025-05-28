@@ -1,0 +1,29 @@
+meta {
+  name: Create compartment
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/compartments
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "compartment": {
+      "name": "Universidade do Minho"
+    }
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 201) {
+    let data = res.getBody();
+    let compartment = data.compartment;
+    
+    bru.setEnvVar("compartment_id", compartment.id);
+  }
+  
+}

@@ -20,9 +20,30 @@ defmodule BellFSWeb.Router do
 
     pipe_through :validate_access_token
 
-    get "/me", AuthController, :me
+    ## User
 
+    get "/me", AuthController, :me
     get "/users/:username/certificate", UserController, :certificate
+
+    scope "/files" do
+      get "/", FileController, :index
+      post "/", FileController, :create
+    end
+
+    ## Admin
+
+    scope "/compartments" do
+      post "/", CompartmentController, :create
+
+      put "/:id/:username", CompartmentController, :add_user
+      delete "/:id/:username", CompartmentController, :remove_user
+    end
+
+    scope "/levels" do
+      get "/", LevelController, :index
+      post "/confidentiality", LevelController, :create_confidentiality
+      post "/integrity", LevelController, :create_integrity
+    end
   end
 
   # Enable LiveDashboard in development

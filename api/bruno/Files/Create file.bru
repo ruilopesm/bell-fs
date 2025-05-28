@@ -1,0 +1,21 @@
+meta {
+  name: Create file
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{host}}/files
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "file": {
+      "compartment_id": "{{compartment_id}}",
+      "confidentiality_id": "{{confidentiality_id}}",
+      "integrity_id": "{{integrity_id}}"
+    }
+  }
+}

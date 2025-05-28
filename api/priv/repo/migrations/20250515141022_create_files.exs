@@ -6,7 +6,7 @@ defmodule BellFS.Repo.Migrations.CreateFiles do
       add :id, :binary_id, primary_key: true
 
       add :name, :string, null: false
-      add :path, :string
+      add :persistent, :string, null: false
 
       add :compartment_id,
           references(
@@ -17,14 +17,14 @@ defmodule BellFS.Repo.Migrations.CreateFiles do
 
       add :confidentiality_id,
           references(
-            :confidentiality_levels,
+            :confidentialities,
             on_delete: :nothing,
             type: :binary_id
           )
 
       add :integrity_id,
           references(
-            :integrity_levels,
+            :integrities,
             on_delete: :nothing,
             type: :binary_id
           )

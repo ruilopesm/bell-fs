@@ -52,6 +52,10 @@ defmodule BellFS.MixProject do
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
 
+      # file uploading
+      {:waffle, "~> 1.1"},
+      {:waffle_ecto, "~> 0.0"},
+
       # telemetry
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:telemetry_metrics, "~> 1.0"},

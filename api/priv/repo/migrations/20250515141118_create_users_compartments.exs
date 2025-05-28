@@ -24,20 +24,22 @@ defmodule BellFS.Repo.Migrations.CreateUsersCompartments do
 
       add :confidentiality_id,
           references(
-            :confidentiality_levels,
+            :confidentialities,
             on_delete: :nothing,
             type: :binary_id
           )
 
       add :integrity_id,
           references(
-            :integrity_levels,
+            :integrities,
             on_delete: :nothing,
             type: :binary_id
           )
 
       timestamps(type: :utc_datetime)
     end
+
+    create unique_index(:users_compartments, [:username, :compartment_id], name: :unique_compartment_access)
 
     create index(:users_compartments, [:username])
     create index(:users_compartments, [:compartment_id])

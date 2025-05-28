@@ -1,4 +1,4 @@
-defmodule BellFS.Security.ConfidentialityLevel do
+defmodule BellFS.Security.Confidentiality do
   use BellFS, :schema
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -7,7 +7,7 @@ defmodule BellFS.Security.ConfidentialityLevel do
   @required_fields ~w(name level)a
   @optional_fields ~w()a
 
-  schema "confidentiality_levels" do
+  schema "confidentialities" do
     field :name, :string
     field :level, :integer
 
@@ -15,9 +15,10 @@ defmodule BellFS.Security.ConfidentialityLevel do
   end
 
   @doc false
-  def changeset(confidentiality_level, attrs) do
-    confidentiality_level
+  def changeset(confidentiality, attrs) do
+    confidentiality
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+    |> unique_constraint(:name, name: :confidentialities_name_index)
   end
 end

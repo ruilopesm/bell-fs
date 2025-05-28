@@ -1,0 +1,26 @@
+meta {
+  name: Add user to compartment
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{host}}/compartments/:id/:username
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: {{compartment_id}}
+  username: {{username}}
+}
+
+body:json {
+  {
+    "user": {
+      "trusted": true,
+      "confidentiality_id": "{{confidentiality_id}}",
+      "integrity_id": "{{integrity_id}}"
+    }
+  }
+}

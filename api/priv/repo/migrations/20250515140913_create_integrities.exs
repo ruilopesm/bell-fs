@@ -2,7 +2,7 @@ defmodule BellFS.Repo.Migrations.CreateIntegrityLevels do
   use Ecto.Migration
 
   def change do
-    create table(:integrity_levels, primary_key: false) do
+    create table(:integrities, primary_key: false) do
       add :id, :binary_id, primary_key: true
 
       add :name, :string, null: false
@@ -10,5 +10,7 @@ defmodule BellFS.Repo.Migrations.CreateIntegrityLevels do
 
       timestamps(type: :utc_datetime)
     end
+
+    create unique_index(:integrities, [:name])
   end
 end

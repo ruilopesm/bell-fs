@@ -9,5 +9,7 @@ defmodule BellFS.Repo.Migrations.CreateCompartments do
 
       timestamps(type: :utc_datetime)
     end
+
+    create unique_index(:compartments, [:name])
   end
 end

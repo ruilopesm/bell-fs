@@ -5,8 +5,8 @@ defmodule BellFS.Security.UserCompartment do
 
   alias BellFS.Security.{
     Compartment,
-    ConfidentialityLevel,
-    IntegrityLevel
+    Confidentiality,
+    Integrity
   }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -15,8 +15,8 @@ defmodule BellFS.Security.UserCompartment do
   @required_fields ~w(
     username
     compartment_id
-    confidentiality_level_id
-    integrity_level_id
+    confidentiality_id
+    integrity_id
   )a
   @optional_fields ~w(trusted)a
 
@@ -29,8 +29,8 @@ defmodule BellFS.Security.UserCompartment do
       type: :string
 
     belongs_to :compartment, Compartment
-    belongs_to :confidentiality_level, ConfidentialityLevel
-    belongs_to :integrity_level, IntegrityLevel
+    belongs_to :confidentiality, Confidentiality
+    belongs_to :integrity, Integrity
 
     timestamps(type: :utc_datetime)
   end
@@ -43,7 +43,19 @@ defmodule BellFS.Security.UserCompartment do
     |> validate_required([:trusted])
     |> foreign_key_constraint(:username)
     |> foreign_key_constraint(:compartment_id)
-    |> foreign_key_constraint(:confidentiality_level_id)
-    |> foreign_key_constraint(:integrity_level_id)
+    |> unique_constraint(
+      :username,
+      name: :unique_compartment_access,
+      message: "user already has access to this compartment"
+    )
+    |> foreign_key_constraint(:confidentiality_id)
+    |> foreign_key_constraint(:integrity_id)
   end
+
+  def preloads, do: [
+    :user,
+    :compartment,
+    :confidentiality,
+    :integrity
+  ]
 end

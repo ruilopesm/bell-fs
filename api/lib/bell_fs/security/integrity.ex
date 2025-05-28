@@ -1,4 +1,4 @@
-defmodule BellFS.Security.IntegrityLevel do
+defmodule BellFS.Security.Integrity do
   use BellFS, :schema
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -7,7 +7,7 @@ defmodule BellFS.Security.IntegrityLevel do
   @required_fields ~w(name level)a
   @optional_fields ~w()a
 
-  schema "integrity_levels" do
+  schema "integrities" do
     field :name, :string
     field :level, :integer
 
@@ -15,9 +15,10 @@ defmodule BellFS.Security.IntegrityLevel do
   end
 
   @doc false
-  def changeset(integrity_level, attrs) do
-    integrity_level
+  def changeset(integrity, attrs) do
+    integrity
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+    |> unique_constraint(:name, name: :integrities_name_index)
   end
 end

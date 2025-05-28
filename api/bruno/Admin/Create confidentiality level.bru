@@ -1,0 +1,29 @@
+meta {
+  name: Create confidentiality level
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{host}}/levels/confidentiality
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "confidentiality": {
+      "name": "Top Secret",
+      "level": 5
+    }
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 201) {
+    let data = res.getBody();
+    let confidentiality = data.confidentiality;
+    
+    bru.setEnvVar("confidentiality_id", confidentiality.id);
+  }
+}

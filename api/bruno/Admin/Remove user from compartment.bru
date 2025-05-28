@@ -1,0 +1,16 @@
+meta {
+  name: Remove user from compartment
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{host}}/compartments/:id/:username
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: {{compartment_id}}
+  username: {{username}}
+}

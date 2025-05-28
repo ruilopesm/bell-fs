@@ -1,6 +1,8 @@
 defmodule BellFS.Security.Compartment do
   use BellFS, :schema
 
+  alias BellFS.Structure.File
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
@@ -10,6 +12,8 @@ defmodule BellFS.Security.Compartment do
   schema "compartments" do
     field :name, :string
 
+    has_many :files, File
+
     timestamps(type: :utc_datetime)
   end
 
@@ -18,5 +22,6 @@ defmodule BellFS.Security.Compartment do
     compartment
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
+    |> unique_constraint(:name, name: :compartments_name_index)
   end
 end

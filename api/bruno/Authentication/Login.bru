@@ -20,10 +20,11 @@ body:json {
 script:post-response {
   if (res.getStatus() === 200) {
     let data = res.getBody();
+    let user = data.user;
     
+    bru.setEnvVar("username", user.username);
     bru.setEnvVar("access_token", data.access_token);
     bru.setEnvVar("refresh_token", data.refresh_token);
   }
   
-  bru.setEnvVar("username", req.body.username)
 }
