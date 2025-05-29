@@ -10,7 +10,7 @@ defmodule BellFSWeb.Router do
   end
 
   pipeline :validate_request_signature do
-    plug BellFSWeb.Plugs.ValidateRequestSignature
+    # plug BellFSWeb.Plugs.ValidateRequestSignature
   end
 
   scope "/", BellFSWeb do
