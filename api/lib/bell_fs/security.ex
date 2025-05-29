@@ -82,9 +82,34 @@ defmodule BellFS.Security do
   end
 
   def create_confidentiality(attrs \\ %{}) do
-    %Confidentiality{}
-    |> Confidentiality.changeset(attrs)
-    |> Repo.insert()
+    level = extract_level(attrs)
+
+    Multi.new()
+    |> Multi.run(:maybe_shift, fn repo, _changes ->
+      case repo.get_by(Confidentiality, level: level) do
+        nil ->
+          {:ok, :no_shift}
+
+        _existing ->
+          repo.update_all(
+            from(c in Confidentiality, where: c.level >= ^level),
+            inc: [level: 1]
+          )
+          {:ok, :shifted}
+      end
+    end)
+    |> Multi.insert(
+      :new_confidentiality,
+      Confidentiality.changeset(%Confidentiality{}, attrs)
+    )
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{new_confidentiality: confidentiality}} ->
+        {:ok, confidentiality}
+
+      {:error, _error, %Ecto.Changeset{} = changeset, _changes} ->
+        {:error, changeset}
+    end
   end
 
   @doc """
@@ -113,6 +138,49 @@ defmodule BellFS.Security do
     |> Repo.exists?()
   end
 
+  def list_integrities do
+    Integrity
+    |> order_by([i], i.level)
+    |> Repo.all()
+  end
+
+  def get_integrity_by_name!(name) do
+    Integrity
+    |> where([i], i.name == ^name)
+    |> Repo.one!()
+  end
+
+  def create_integrity(attrs \\ %{}) do
+    level = extract_level(attrs)
+
+    Multi.new()
+    |> Multi.run(:maybe_shift, fn repo, _changes ->
+      case repo.get_by(Integrity, level: level) do
+        nil ->
+          {:ok, :no_shift}
+
+        _existing ->
+          repo.update_all(
+            from(i in Integrity, where: i.level >= ^level),
+            inc: [level: 1]
+          )
+          {:ok, :shifted}
+      end
+    end)
+    |> Multi.insert(
+      :new_integrity,
+      Integrity.changeset(%Integrity{}, attrs)
+    )
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{new_integrity: integrity}} ->
+        {:ok, integrity}
+
+      {:error, _error, %Ecto.Changeset{} = changeset, _changes} ->
+        {:error, changeset}
+    end
+  end
+
   @doc """
   1. Files can raise their integrity level via trusted users with a level >= file's integrity level.
   (fortify)
@@ -139,24 +207,6 @@ defmodule BellFS.Security do
     |> Repo.exists?()
   end
 
-  def list_integrities do
-    Integrity
-    |> order_by([i], i.level)
-    |> Repo.all()
-  end
-
-  def get_integrity_by_name!(name) do
-    Integrity
-    |> where([i], i.name == ^name)
-    |> Repo.one!()
-  end
-
-  def create_integrity(attrs \\ %{}) do
-    %Integrity{}
-    |> Integrity.changeset(attrs)
-    |> Repo.insert()
-  end
-
   def create_compartment_conflict(attrs \\ %{}) do
     %CompartmentConflict{}
     |> CompartmentConflict.changeset(attrs)
@@ -169,5 +219,15 @@ defmodule BellFS.Security do
     |> where([cc], cc.compartment_a_id == ^compartment_id or cc.compartment_b_id == ^compartment_id)
     |> join(:inner, [cc], uc in UserCompartment, on: uc.username == ^username)
     |> Repo.exists?()
+  end
+
+  defp extract_level(attrs) do
+    attrs
+    |> Map.get("level")
+    |> case do
+      l when is_integer(l) -> l
+      l when is_binary(l) -> String.to_integer(l)
+      _ -> nil
+    end
   end
 end

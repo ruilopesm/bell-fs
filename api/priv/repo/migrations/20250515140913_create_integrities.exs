@@ -12,5 +12,6 @@ defmodule BellFS.Repo.Migrations.CreateIntegrityLevels do
     end
 
     create unique_index(:integrities, [:name])
+    create index(:integrities, [:level])
   end
 end

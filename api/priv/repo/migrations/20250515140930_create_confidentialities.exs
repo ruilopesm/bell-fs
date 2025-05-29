@@ -12,5 +12,6 @@ defmodule BellFS.Repo.Migrations.CreateConfidentialityLevels do
     end
 
     create unique_index(:confidentialities, [:name])
+    create index(:confidentialities, [:level])
   end
 end

@@ -20,5 +20,6 @@ defmodule BellFS.Security.Confidentiality do
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> unique_constraint(:name, name: :confidentialities_name_index)
+    |> unique_constraint(:level, name: :confidentialities_level_index)
   end
 end

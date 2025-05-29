@@ -20,5 +20,6 @@ defmodule BellFS.Security.Integrity do
     |> cast(attrs, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> unique_constraint(:name, name: :integrities_name_index)
+    |> unique_constraint(:level, name: :integrities_level_index)
   end
 end
