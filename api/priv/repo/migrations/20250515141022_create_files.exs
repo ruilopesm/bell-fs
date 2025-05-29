@@ -6,7 +6,7 @@ defmodule BellFS.Repo.Migrations.CreateFiles do
       add :id, :binary_id, primary_key: true
 
       add :name, :string, null: false
-      add :content, :string, null: false
+      add :content, :text, null: false
 
       add :compartment_id,
           references(
