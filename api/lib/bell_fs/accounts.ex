@@ -16,6 +16,7 @@ defmodule BellFS.Accounts do
   def create_user(attrs \\ %{}) do
     secret = NimbleTOTP.secret()
     attrs = Map.put(attrs, "totp_secret", secret)
+
     %User{}
     |> User.registration_changeset(attrs)
     |> Repo.insert()
@@ -42,13 +43,8 @@ defmodule BellFS.Accounts do
   end
 
   defp maybe_authenticate_user(%User{} = user, password, totp_code) do
-    if Argon2.verify_pass(password, user.hashed_password) do
-      if NimbleTOTP.valid?(user.totp_secret, totp_code) do
-        {:ok, user}
-      else
-        Argon2.no_user_verify()
-        {:error, :invalid_totp_code}
-      end
+    if Argon2.verify_pass(password, user.hashed_password) && NimbleTOTP.valid?(user.totp_secret, totp_code) do
+      {:ok, user}
     else
       Argon2.no_user_verify()
       {:error, :invalid_credentials}

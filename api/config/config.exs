@@ -7,6 +7,17 @@
 # General application configuration
 import Config
 
+config :pythonx, :uv_init,
+  pyproject_toml: """
+  [project]
+  name = "bell_fs"
+  version = "0.1.0"
+  requires-python = "==3.13.*"
+  dependencies = [
+    "cryptography==44.0.3"
+  ]
+  """
+
 config :bell_fs,
   ecto_repos: [BellFS.Repo],
   generators: [timestamp_type: :utc_datetime, binary_id: true]

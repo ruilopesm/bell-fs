@@ -48,6 +48,9 @@ defmodule BellFS.MixProject do
       {:guardian_db, "~> 3.0"},
       {:nimble_totp, "~> 1.0"},
 
+      # auditability
+      {:pythonx, "~> 0.4.0"},
+
       # database
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.10"},

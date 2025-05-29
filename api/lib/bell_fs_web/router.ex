@@ -9,6 +9,10 @@ defmodule BellFSWeb.Router do
     plug BellFSWeb.Plugs.ValidateAccessToken
   end
 
+  pipeline :validate_request_signature do
+    plug BellFSWeb.Plugs.ValidateRequestSignature
+  end
+
   scope "/", BellFSWeb do
     pipe_through :api
 
@@ -18,7 +22,7 @@ defmodule BellFSWeb.Router do
 
     post "/refresh", AuthController, :refresh
 
-    pipe_through :validate_access_token
+    pipe_through [:validate_access_token, :validate_request_signature]
 
     ## User
 

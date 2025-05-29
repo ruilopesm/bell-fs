@@ -45,8 +45,9 @@ defmodule BellFSWeb.Endpoint do
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
   plug Plug.Parsers,
-    parsers: [:urlencoded, :multipart, :json],
+    parsers: [:json, :urlencoded],
     pass: ["*/*"],
+    body_reader: {BellFSWeb.BodyCacheReader, :read_body, []},
     length: 16_000_000,
     read_length: 2_000_000,
     json_decoder: Phoenix.json_library()
