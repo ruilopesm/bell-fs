@@ -151,10 +151,10 @@ defmodule BellFS.Structure do
   A user is said to have permission to update a file if:
 
   1. There's a `users_compartments` entry for the user.
-  2. The file's confidentiality <= user's confidentiality level on such compartment.
-  3. The file's integrity >= user's integrity level on such compartment.
+  2. The file's confidentiality >= user's confidentiality level on such compartment.
+  3. The file's integrity <= user's integrity level on such compartment.
   """
-  defp permission_filter(:update), do: dynamic([f, uc, uco, uin, fco, fin], fco.level <= uco.level and fin.level >= uin.level)
+  defp permission_filter(:update), do: dynamic([f, uc, uco, uin, fco, fin], fco.level >= uco.level and fin.level <= uin.level)
 
   false && @doc """
   A user is said to have permission to delete a file if:
