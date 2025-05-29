@@ -46,6 +46,7 @@ defmodule BellFS.MixProject do
       {:argon2_elixir, "~> 4.0"},
       {:guardian, "~> 2.3"},
       {:guardian_db, "~> 3.0"},
+      {:nimble_totp, "~> 1.0"},
 
       # database
       {:phoenix_ecto, "~> 4.5"},

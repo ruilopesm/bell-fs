@@ -19,6 +19,12 @@ defmodule BellFSWeb.AuthJSON do
   end
 
   def me(%{user: user}) do
-    %{user: UserJSON.data(user)}
+    user_totp_uri = NimbleTOTP.otpauth_uri("BellFS:#{user.username}", user.totp_secret, issuer: "BellFS")
+    qr_url = "https://api.qrserver.com/v1/create-qr-code/?data=#{URI.encode(user_totp_uri)}&size=200x200"
+    %{
+      user: UserJSON.data(user),
+      user_totp_uri: user_totp_uri,
+      user_totp_qr: qr_url
+    }
   end
 end

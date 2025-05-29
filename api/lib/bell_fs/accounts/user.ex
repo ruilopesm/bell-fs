@@ -3,7 +3,7 @@ defmodule BellFS.Accounts.User do
 
   @primary_key {:username, :string, autogenerate: false}
 
-  @required_fields ~w(username certificate password)a
+  @required_fields ~w(username certificate password totp_secret)a
   @optional_fields ~w()a
 
   schema "users" do
@@ -12,6 +12,7 @@ defmodule BellFS.Accounts.User do
 
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string
+    field :totp_secret, :binary
 
     timestamps(type: :utc_datetime)
   end

@@ -6,7 +6,7 @@ defmodule BellFSWeb.FallbackController do
   """
   use BellFSWeb, :controller
 
-  defguardp is_404(reason) when reason in [:not_found, :invalid_credentials]
+  defguardp is_404(reason) when reason in [:not_found, :invalid_credentials, :invalid_totp_code]
 
   defguardp is_401(reason)
             when reason in [

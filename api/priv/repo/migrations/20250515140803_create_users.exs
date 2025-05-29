@@ -9,6 +9,8 @@ defmodule BellFS.Repo.Migrations.CreateUsers do
 
       add :hashed_password, :string, null: false
 
+      add :totp_secret, :binary, null: false
+
       timestamps(type: :utc_datetime)
     end
   end

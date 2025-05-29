@@ -14,6 +14,8 @@ defmodule BellFS.Accounts do
   fail, the entire transaction is rolled back.
   """
   def create_user(attrs \\ %{}) do
+    secret = NimbleTOTP.secret()
+    attrs = Map.put(attrs, "totp_secret", secret)
     %User{}
     |> User.registration_changeset(attrs)
     |> Repo.insert()
@@ -29,19 +31,24 @@ defmodule BellFS.Accounts do
   If there is no user or the user doesn't have a password, we
   call `Argon2.no_user_verify()` to prevent timing attacks.
   """
-  def authenticate_user(username, password) do
+  def authenticate_user(username, password, totp_code) do
     get_user(username)
-    |> maybe_authenticate_user(password)
+    |> maybe_authenticate_user(password, totp_code)
   end
 
-  defp maybe_authenticate_user(nil, _) do
+  defp maybe_authenticate_user(nil, _, _) do
     Argon2.no_user_verify()
     {:error, :invalid_credentials}
   end
 
-  defp maybe_authenticate_user(%User{} = user, password) do
+  defp maybe_authenticate_user(%User{} = user, password, totp_code) do
     if Argon2.verify_pass(password, user.hashed_password) do
-      {:ok, user}
+      if NimbleTOTP.valid?(user.totp_secret, totp_code) do
+        {:ok, user}
+      else
+        Argon2.no_user_verify()
+        {:error, :invalid_totp_code}
+      end
     else
       Argon2.no_user_verify()
       {:error, :invalid_credentials}

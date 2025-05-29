@@ -14,8 +14,8 @@ defmodule BellFSWeb.AuthController do
     end
   end
 
-  def login(conn, %{"username" => username, "password" => password}) do
-    with {:ok, %User{} = user} <- Accounts.authenticate_user(username, password),
+  def login(conn, %{"username" => username, "password" => password, "totp_code" => totp_code}) do
+    with {:ok, %User{} = user} <- Accounts.authenticate_user(username, password, totp_code),
          {:ok, access_token, _claims} <-
            Authentication.Guardian.encode_and_sign(user, %{},
              token_type: "access",
