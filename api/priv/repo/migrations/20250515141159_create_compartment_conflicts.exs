@@ -11,6 +11,14 @@ defmodule BellFS.Repo.Migrations.CreateCompartmentConflicts do
       timestamps(type: :utc_datetime)
     end
 
+    execute("""
+    CREATE UNIQUE INDEX unique_compartment_conflict_sorted
+      ON compartment_conflicts (
+        LEAST(compartment_a_id, compartment_b_id),
+        GREATEST(compartment_a_id, compartment_b_id)
+      );
+    """)
+
     create index(:compartment_conflicts, [:compartment_a_id])
     create index(:compartment_conflicts, [:compartment_b_id])
   end

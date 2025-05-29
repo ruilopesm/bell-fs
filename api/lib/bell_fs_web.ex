@@ -74,6 +74,14 @@ defmodule BellFSWeb do
         |> put_view(BellFSWeb.ErrorJSON)
         |> render(:"403")
       end
+
+      def bad_request(conn, message) do
+        conn
+        |> put_status(:bad_request)
+        |> put_view(BellFSWeb.ErrorJSON)
+        |> assign(:message, message)
+        |> render(:"400")
+      end
     end
   end
 

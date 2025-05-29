@@ -10,12 +10,12 @@ defmodule BellFSWeb.CompartmentJSON do
   }
   alias BellFSWeb.LevelJSON
 
-  def show(%{compartment: compartment}) do
-    %{compartment: data(compartment)}
+  def index(%{compartments: compartments}) do
+    %{compartments: for(compartment <- compartments, do: full(compartment))}
   end
 
-  def show(%{compartments: compartments}) do
-    %{compartments: Enum.map(compartments, &data/1)}
+  def show(%{compartment: compartment}) do
+    %{compartment: data(compartment)}
   end
 
   def show(%{user_compartment: user_compartment}) do
@@ -34,24 +34,39 @@ defmodule BellFSWeb.CompartmentJSON do
   end
 
   def data(%UserCompartment{} = user_compartment) do
+    compartment = %Compartment{} = user_compartment.compartment
     confidentiality = %Confidentiality{} = user_compartment.confidentiality
     integrity = %Integrity{} = user_compartment.integrity
 
     %{
       id: user_compartment.id,
       username: user_compartment.username,
-      compartment_id: user_compartment.compartment_id,
       trusted: user_compartment.trusted,
+      compartment: data(compartment),
       confidentiality: LevelJSON.data(confidentiality),
-      integrity: LevelJSON.data(integrity),
+      integrity: LevelJSON.data(integrity)
     }
   end
 
   def data(%CompartmentConflict{} = compartment_conflict) do
+    compartment_a = %Compartment{} = compartment_conflict.compartment_a
+    compartment_b = %Compartment{} = compartment_conflict.compartment_b
+
     %{
-      id: compartment_conflict.id,
-      compartment_a_id: compartment_conflict.compartment_a_id,
-      compartment_b_id: compartment_conflict.compartment_b_id
+      compartment_a: data(compartment_a),
+      compartment_b: data(compartment_b)
     }
+  end
+
+  def full(%{compartment: compartment, uc: user_compartment}) do
+    confidentiality = %Confidentiality{} = user_compartment.confidentiality
+    integrity = %Integrity{} = user_compartment.integrity
+
+    %{
+      trusted: user_compartment.trusted,
+      confidentiality: LevelJSON.data(confidentiality),
+      integrity: LevelJSON.data(integrity),
+    }
+    |> Map.merge(data(compartment))
   end
 end

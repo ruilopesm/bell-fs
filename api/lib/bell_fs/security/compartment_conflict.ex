@@ -23,5 +23,12 @@ defmodule BellFS.Security.CompartmentConflict do
     |> validate_required(@required_fields)
     |> foreign_key_constraint(:compartment_a_id)
     |> foreign_key_constraint(:compartment_b_id)
+    |> unique_constraint(
+      [:compartment_a_id, :compartment_b_id],
+      name: :unique_compartment_conflict_sorted,
+      message: "compartment conflict already exists"
+    )
   end
+
+  def preloads, do: [:compartment_a, :compartment_b]
 end

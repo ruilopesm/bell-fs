@@ -1,31 +1,23 @@
 defmodule BellFSWeb.CompartmentController do
   use BellFSWeb, :controller
 
-  alias BellFS.Security.CompartmentConflict
   alias BellFS.Security
-  alias BellFS.Security.{Compartment, UserCompartment}
+  alias BellFS.Security.{
+    Compartment,
+    CompartmentConflict,
+    UserCompartment
+  }
 
   def list(conn, _) do
-    user = conn.assigns.current_user
-    compartments = Security.list_compartments(user)
+    compartments = Security.list_compartments(conn.assigns.current_user)
+
     conn
     |> put_status(:ok)
-    |> render(:show, compartments: compartments)
+    |> render(:index, compartments: compartments)
   end
 
-  def create(conn, %{"compartment" => params, "users" => users}) do
+  def create(conn, %{"compartment" => params}) do
     with {:ok, %Compartment{} = compartment} <- Security.create_compartment(params) do
-      # Create userCompartment for each user in users -> {username: "username", confidentiality: "confidentiality", integrity: "integrity"}
-      Enum.each(users, fn user_params ->
-        attrs = %{}
-        attrs = Map.put(attrs, "username", user_params["username"])
-        attrs = Map.put(attrs, "compartment_id", compartment.id)
-        attrs = Map.put(attrs, "trusted", true)
-        attrs = Map.put(attrs, "confidentiality_id", Security.get_confidentiality_by_name!(user_params["confidentiality"]).id)
-        attrs = Map.put(attrs, "integrity_id", Security.get_integrity_by_name!(user_params["integrity"]).id)
-
-        Security.add_user_to_compartment(attrs)
-      end)
       conn
       |> put_status(:created)
       |> render(:show, compartment: compartment)
@@ -33,30 +25,28 @@ defmodule BellFSWeb.CompartmentController do
   end
 
   def add_user(conn, %{"id" => id, "username" => username, "user" => params}) do
-    attrs = %{}
+    can_be_added? = !Security.is_user_compartment_in_conflict?(username, id)
 
-    attrs = Map.put(attrs, "username", username)
-    attrs = Map.put(attrs, "compartment_id", id)
+    if can_be_added? do
+      attrs = %{}
 
-    # User cannot be added to a compartment in conflict with another compartment he is in
+      confidentiality = Security.get_confidentiality_by_name!(params["confidentiality"])
+      attrs = Map.put(attrs, "confidentiality_id", confidentiality.id)
 
-    if Security.is_user_compartment_in_conflict?(username, id) do
-      conn
-      |> put_status(:conflict)
-      |> json(%{error: "User is in conflict with this compartment"})
-      |> halt()
-    end
+      integrity = Security.get_integrity_by_name!(params["integrity"])
+      attrs = Map.put(attrs, "integrity_id", integrity.id)
 
-    confidentiality = Security.get_confidentiality_by_name!(params["confidentiality"])
-    attrs = Map.put(attrs, "confidentiality_id", confidentiality.id)
+      attrs = Map.put(attrs, "compartment_id", id)
+      attrs = Map.put(attrs, "username", username)
+      attrs = Map.put(attrs, "trusted", params["trusted"] || false)
 
-    integrity = Security.get_integrity_by_name!(params["integrity"])
-    attrs = Map.put(attrs, "integrity_id", integrity.id)
-
-    with {:ok, %UserCompartment{} = user_compartment} <- Security.add_user_to_compartment(attrs) do
-      conn
-      |> put_status(:created)
-      |> render(:show, user_compartment: user_compartment)
+      with {:ok, %UserCompartment{} = user_compartment} <- Security.add_user_to_compartment(attrs) do
+        conn
+        |> put_status(:created)
+        |> render(:show, user_compartment: user_compartment)
+      end
+    else
+      forbidden(conn)
     end
   end
 
@@ -67,13 +57,22 @@ defmodule BellFSWeb.CompartmentController do
   end
 
   def add_conflict(conn, %{"conflict" => params}) do
+    compartment_a = Security.get_compartment_by_name!(params["compartment_a"])
+    compartment_b = Security.get_compartment_by_name!(params["compartment_b"])
 
-    compartment_a = Security.get_compartment_by_name!(params["compartment_a_name"])
-    compartment_b = Security.get_compartment_by_name!(params["compartment_b_name"])
-    with {:ok, %CompartmentConflict{} = conflict} <- Security.create_compartment_conflict(%{compartment_a_id: compartment_a.id, compartment_b_id: compartment_b.id}) do
-      conn
-      |> put_status(:created)
-      |> render(:show, compartment_conflict: conflict)
+    if compartment_a.id != compartment_b.id do
+      attrs = %{
+        compartment_a_id: compartment_a.id,
+        compartment_b_id: compartment_b.id
+      }
+
+      with {:ok, %CompartmentConflict{} = conflict} <- Security.create_compartment_conflict(attrs) do
+        conn
+        |> put_status(:created)
+        |> render(:show, compartment_conflict: conflict)
+      end
+    else
+      bad_request(conn, "cannot create conflict between the same compartment")
     end
   end
 end

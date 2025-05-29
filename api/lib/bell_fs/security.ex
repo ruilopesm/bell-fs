@@ -14,6 +14,20 @@ defmodule BellFS.Security do
 
   ### Compartments
 
+  def list_compartments(%User{username: username} = _current_user) do
+    rows =
+      Compartment
+      |> join(:inner, [c], uc in UserCompartment, on: uc.compartment_id == c.id)
+      |> where([c, uc], uc.username == ^username)
+      |> select([c, uc], {c, uc})
+      |> Repo.all()
+
+    Enum.map(rows, fn {compartment, uc} ->
+      uc = Repo.preload(uc, UserCompartment.preloads())
+      %{compartment: compartment, uc: uc}
+    end)
+  end
+
   def get_compartment!(id), do: Repo.get!(Compartment, id)
 
   def get_compartment_by_name!(name) do
@@ -26,14 +40,6 @@ defmodule BellFS.Security do
     %Compartment{}
     |> Compartment.changeset(attrs)
     |> Repo.insert()
-  end
-
-  def list_compartments(%User{username: username}) do
-    UserCompartment
-    |> where([uc], uc.username == ^username)
-    |> Repo.all()
-    |> Repo.preload(:compartment)
-    |> Enum.map(& &1.compartment)
   end
 
   def is_user_trusted_in_compartment?(%User{username: username} = _current_user, compartment) do
@@ -102,6 +108,7 @@ defmodule BellFS.Security do
     %CompartmentConflict{}
     |> CompartmentConflict.changeset(attrs)
     |> Repo.insert()
+    |> Repo.preload_after_mutation(CompartmentConflict.preloads())
   end
 
   def is_user_compartment_in_conflict?(username, compartment_id) do
@@ -110,5 +117,4 @@ defmodule BellFS.Security do
     |> join(:inner, [cc], uc in UserCompartment, on: uc.username == ^username)
     |> Repo.exists?()
   end
-
 end

@@ -6,9 +6,6 @@ defmodule BellFSWeb.AuthController do
   alias BellFS.Repo
   alias BellFSWeb.Authentication
 
-  @doc """
-  Registers a new user, by creating its entity in the database
-  """
   def register(conn, %{"user" => params}) do
     with {:ok, %User{} = user} <- Accounts.create_user(params) do
       conn
@@ -17,11 +14,6 @@ defmodule BellFSWeb.AuthController do
     end
   end
 
-  @doc """
-  Logs in a user and returns it with two freshly generated JWT tokens:
-  - An access token, valid for 15 minutes
-  - A refresh token, valid for 30 days
-  """
   def login(conn, %{"username" => username, "password" => password}) do
     with {:ok, %User{} = user} <- Accounts.authenticate_user(username, password),
          {:ok, access_token, _claims} <-
@@ -47,16 +39,6 @@ defmodule BellFSWeb.AuthController do
     end
   end
 
-  @doc """
-  Meant to be used by the client to generate a new access token
-  using the refresh token.
-
-  Also, revokes the old refresh token, so it can't be used again.
-
-  As for the `login` action, it returns two freshly generated JWT tokens:
-  - An access token, valid for 15 minutes
-  - A refresh token, valid for 30 days
-  """
   def refresh(conn, %{"refresh_token" => old_refresh_token}) do
     with {:ok, claims} <-
            Authentication.Guardian.decode_and_verify(old_refresh_token, %{"typ" => "refresh"}),
@@ -78,12 +60,6 @@ defmodule BellFSWeb.AuthController do
     end
   end
 
-  @doc """
-  Assumes that user is authenticated, by successfully
-  passing the authentication plug.
-
-  Renders the user present in the connection assigns (`conn.assigns`).
-  """
   def me(conn, _) do
     user = conn.assigns[:current_user]
     user = Repo.preload(user, [])
