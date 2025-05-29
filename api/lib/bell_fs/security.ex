@@ -103,4 +103,12 @@ defmodule BellFS.Security do
     |> CompartmentConflict.changeset(attrs)
     |> Repo.insert()
   end
+
+  def is_user_compartment_in_conflict?(username, compartment_id) do
+    CompartmentConflict
+    |> where([cc], cc.compartment_a_id == ^compartment_id or cc.compartment_b_id == ^compartment_id)
+    |> join(:inner, [cc], uc in UserCompartment, on: uc.username == ^username)
+    |> Repo.exists?()
+  end
+
 end

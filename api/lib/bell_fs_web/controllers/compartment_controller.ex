@@ -27,6 +27,15 @@ defmodule BellFSWeb.CompartmentController do
     attrs = Map.put(attrs, "username", username)
     attrs = Map.put(attrs, "compartment_id", id)
 
+    # User cannot be added to a compartment in conflict with another compartment he is in
+
+    if Security.is_user_compartment_in_conflict?(username, id) do
+      conn
+      |> put_status(:conflict)
+      |> json(%{error: "User is in conflict with this compartment"})
+      |> halt()
+    end
+
     confidentiality = Security.get_confidentiality_by_name!(params["confidentiality"])
     attrs = Map.put(attrs, "confidentiality_id", confidentiality.id)
 
