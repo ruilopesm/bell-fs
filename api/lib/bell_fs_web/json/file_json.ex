@@ -1,9 +1,13 @@
 defmodule BellFSWeb.FileJSON do
   @moduledoc false
 
-  alias BellFS.Security.{Confidentiality, Integrity}
+  alias BellFS.Security.{
+    Compartment,
+    Confidentiality,
+    Integrity
+  }
   alias BellFS.Structure.File
-  alias BellFSWeb.LevelJSON
+  alias BellFSWeb.{CompartmentJSON, LevelJSON}
 
   def index(%{files: files}) do
     %{files: for(file <- files, do: lazy(file))}
@@ -31,13 +35,18 @@ defmodule BellFSWeb.FileJSON do
     }
   end
 
-  def lazy(%{file: file, trusted: trusted}) do
+  def lazy(%{
+    file: file,
+    user_compartment: user_compartment,
+    permissions: permissions
+  }) do
+    compartment = %Compartment{} = user_compartment.compartment
+
     %{
       id: file.id,
       name: file.name,
-      trusted: trusted,
-      confidentiality: LevelJSON.data(file.confidentiality),
-      integrity: LevelJSON.data(file.integrity)
+      compartment: CompartmentJSON.data(compartment),
+      permissions: permissions
     }
   end
 end

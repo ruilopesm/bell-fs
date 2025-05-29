@@ -22,12 +22,23 @@ defmodule BellFS.Structure do
     rows =
       current_user
       |> scoped_query(:read)
-      |> select([f, uc, uco, uin, fco, fin], {f, uc})
+      |> select([f, uc, uco, uin, fco, fin], {f, uc, uco, uin, fco, fin})
       |> Repo.all()
 
-    Enum.map(rows, fn {file, uc} ->
+    Enum.map(rows, fn {file, uc, uco, uin, fco, fin} ->
       file = Repo.preload(file, File.preloads())
-      %{file: file, trusted: uc.trusted}
+      uc = Repo.preload(uc, UserCompartment.preloads())
+
+      %{
+        file: file,
+        user_compartment: uc,
+        permissions: %{
+          read: true,
+          update: Kernel.>=(fco.level, uco.level) && Kernel.<=(fin.level, uin.level),
+          delete: uc.trusted && Kernel.<=(fco.level, uco.level) && Kernel.<=(fin.level, uin.level),
+          manage: uc.trusted
+        }
+      }
     end)
   end
 
