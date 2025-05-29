@@ -36,6 +36,7 @@ defmodule BellFSWeb.Router do
     ## Admin
 
     scope "/compartments" do
+      get "/", CompartmentController, :list
       post "/", CompartmentController, :create
 
       put "/:id/:username", CompartmentController, :add_user

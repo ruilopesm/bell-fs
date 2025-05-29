@@ -14,6 +14,10 @@ defmodule BellFSWeb.CompartmentJSON do
     %{compartment: data(compartment)}
   end
 
+  def show(%{compartments: compartments}) do
+    %{compartments: Enum.map(compartments, &data/1)}
+  end
+
   def show(%{user_compartment: user_compartment}) do
     %{user_compartment: data(user_compartment)}
   end

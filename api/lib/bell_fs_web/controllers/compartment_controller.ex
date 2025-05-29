@@ -5,6 +5,14 @@ defmodule BellFSWeb.CompartmentController do
   alias BellFS.Security
   alias BellFS.Security.{Compartment, UserCompartment}
 
+  def list(conn, _) do
+    user = conn.assigns.current_user
+    compartments = Security.list_compartments(user)
+    conn
+    |> put_status(:ok)
+    |> render(:show, compartments: compartments)
+  end
+
   def create(conn, %{"compartment" => params}) do
     with {:ok, %Compartment{} = compartment} <- Security.create_compartment(params) do
       conn

@@ -1,0 +1,15 @@
+meta {
+  name: Get user compartments
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{host}}/compartments
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

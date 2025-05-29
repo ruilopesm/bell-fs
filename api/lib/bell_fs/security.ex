@@ -28,6 +28,14 @@ defmodule BellFS.Security do
     |> Repo.insert()
   end
 
+  def list_compartments(%User{username: username}) do
+    UserCompartment
+    |> where([uc], uc.username == ^username)
+    |> Repo.all()
+    |> Repo.preload(:compartment)
+    |> Enum.map(& &1.compartment)
+  end
+
   def is_user_trusted_in_compartment?(%User{username: username} = _current_user, compartment) do
     UserCompartment
     |> where([uc], uc.username == ^username and uc.compartment_id == ^compartment.id)
