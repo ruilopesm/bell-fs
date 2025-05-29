@@ -3,6 +3,7 @@ defmodule BellFS.Security do
 
   use BellFS, :context
 
+  alias BellFS.Accounts.User
   alias BellFS.Security.{
     Compartment,
     CompartmentConflict,
@@ -27,9 +28,10 @@ defmodule BellFS.Security do
     |> Repo.insert()
   end
 
-  def has_access_to_compartment?(username, compartment_id) do
+  def is_user_trusted_in_compartment?(%User{username: username} = _current_user, compartment) do
     UserCompartment
-    |> where([uc], uc.username == ^username and uc.compartment_id == ^compartment_id)
+    |> where([uc], uc.username == ^username and uc.compartment_id == ^compartment.id)
+    |> where([uc], uc.trusted == true)
     |> Repo.exists?()
   end
 
@@ -37,7 +39,7 @@ defmodule BellFS.Security do
     %UserCompartment{}
     |> UserCompartment.changeset(attrs)
     |> Repo.insert()
-    |> Repo.after_insert_preload(UserCompartment.preloads())
+    |> Repo.preload_after_mutation(UserCompartment.preloads())
   end
 
   def remove_user_from_compartment(compartment_id, username) do

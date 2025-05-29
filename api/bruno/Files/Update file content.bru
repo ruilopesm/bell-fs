@@ -1,0 +1,24 @@
+meta {
+  name: Update file content
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{host}}/files/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: {{file_id}}
+}
+
+body:json {
+  {
+    "file": {
+      "name": "LICENSE.txt",
+      "content": "Um novo contéudo ainda mais fixe"
+    }
+  }
+}

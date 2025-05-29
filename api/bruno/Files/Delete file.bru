@@ -1,0 +1,15 @@
+meta {
+  name: Delete file
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{host}}/files/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: {{file_id}}
+}

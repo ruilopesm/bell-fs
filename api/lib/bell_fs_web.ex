@@ -46,6 +46,7 @@ defmodule BellFSWeb do
       action_fallback BellFSWeb.FallbackController
 
       unquote(verified_routes())
+      unquote(response_helpers())
     end
   end
 
@@ -55,6 +56,24 @@ defmodule BellFSWeb do
         endpoint: BellFSWeb.Endpoint,
         router: BellFSWeb.Router,
         statics: BellFSWeb.static_paths()
+    end
+  end
+
+  def response_helpers do
+    quote do
+      def not_found(conn) do
+        conn
+        |> put_status(:not_found)
+        |> put_view(BellFSWeb.ErrorJSON)
+        |> render(:"404")
+      end
+
+      def forbidden(conn) do
+        conn
+        |> put_status(:forbidden)
+        |> put_view(BellFSWeb.ErrorJSON)
+        |> render(:"403")
+      end
     end
   end
 

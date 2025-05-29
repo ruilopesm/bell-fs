@@ -25,6 +25,11 @@ defmodule BellFSWeb.Endpoint do
     gzip: false,
     only: BellFSWeb.static_paths()
 
+  plug Plug.Static,
+    at: "/uploads",
+    from: Path.expand("priv/uploads"),
+    gzip: false
+
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
@@ -42,6 +47,8 @@ defmodule BellFSWeb.Endpoint do
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
+    length: 16_000_000,
+    read_length: 2_000_000,
     json_decoder: Phoenix.json_library()
 
   plug Plug.MethodOverride
