@@ -33,6 +33,11 @@ defmodule BellFSWeb.Router do
       delete "/:id", FileController, :delete
     end
 
+    ## Trusted
+
+    put "/files/:id/confidentiality", FileController, :set_confidentiality
+    put "/files/:id/integrity", FileController, :set_integrity
+
     ## Admin
 
     scope "/compartments" do

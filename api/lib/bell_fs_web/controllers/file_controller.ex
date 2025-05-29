@@ -78,6 +78,40 @@ defmodule BellFSWeb.FileController do
     end
   end
 
+  def set_confidentiality(conn, %{"id" => id, "confidentiality" => confidentiality}) do
+    current_user = conn.assigns.current_user
+    can_update_confidentiality? = Security.can_update_file_confidentiality?(current_user, id, confidentiality)
+
+    if can_update_confidentiality? do
+      file = Structure.get_file!(id)
+
+      with {:ok, %File{} = file} <- Structure.set_file_confidentiality(file, confidentiality) do
+        conn
+        |> put_status(:ok)
+        |> render(:show, file: file)
+      end
+    else
+      forbidden(conn)
+    end
+  end
+
+  def set_integrity(conn, %{"id" => id, "integrity" => integrity}) do
+    current_user = conn.assigns.current_user
+    can_update_integrity? = Security.can_update_file_integrity?(current_user, id, integrity)
+
+    if can_update_integrity? do
+      file = Structure.get_file!(id)
+
+      with {:ok, %File{} = file} <- Structure.set_file_integrity(file, integrity) do
+        conn
+        |> put_status(:ok)
+        |> render(:show, file: file)
+      end
+    else
+      forbidden(conn)
+    end
+  end
+
   def delete(conn, %{"id" => id}) do
     current_user = conn.assigns.current_user
     can_delete? = Structure.can_delete_file?(current_user, id)

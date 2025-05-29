@@ -4,6 +4,7 @@ defmodule BellFS.Security do
   use BellFS, :context
 
   alias BellFS.Accounts.User
+  alias BellFS.Structure.File
   alias BellFS.Security.{
     Compartment,
     CompartmentConflict,
@@ -84,6 +85,58 @@ defmodule BellFS.Security do
     %Confidentiality{}
     |> Confidentiality.changeset(attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+  1. Files can lower their condfidentiality level via trusted users with a level >= file's confidentiality level.
+  (expurge)
+
+  2. Files can raise their condfidentiality level via any trusted user.
+  (elevate)
+  """
+  def can_update_file_confidentiality?(
+    %User{username: username} = _current_user,
+    file_id,
+    confidentiality_name
+  ) do
+    UserCompartment
+    |> where([uc], uc.username == ^username and uc.trusted == true)
+    |> join(:inner, [uc], f in File, on: f.compartment_id == uc.compartment_id and f.id == ^file_id)
+    |> join(:inner, [uc, f], old in Confidentiality, on: old.id == f.confidentiality_id)
+    |> join(:inner, [uc, f, old], new in Confidentiality, on: new.name == ^confidentiality_name)
+    |> join(:inner, [uc, f, old, new], uco in Confidentiality, on: uco.id == uc.confidentiality_id)
+    |> where([uc, f, old, new, uco],
+      (new.level < old.level and uco.level >= old.level) or
+      (new.level > old.level)
+    )
+    |> select([uc, f, old, new, uco], uc.id)
+    |> Repo.exists?()
+  end
+
+  @doc """
+  1. Files can raise their integrity level via trusted users with a level >= file's integrity level.
+  (fortify)
+
+  2. Files can lower their integrity level via any trusted user.
+  (deteriorate)
+  """
+  def can_update_file_integrity?(
+    %User{username: username} = _current_user,
+    file_id,
+    integrity_name
+  ) do
+    UserCompartment
+    |> where([uc], uc.username == ^username and uc.trusted == true)
+    |> join(:inner, [uc], f in File, on: f.compartment_id == uc.compartment_id and f.id == ^file_id)
+    |> join(:inner, [uc, f], old in Integrity, on: old.id == f.integrity_id)
+    |> join(:inner, [uc, f, old], new in Integrity, on: new.name == ^integrity_name)
+    |> join(:inner, [uc, f, old, new], uin in Integrity, on: uin.id == uc.integrity_id)
+    |> where([uc, f, old, new, uin],
+      (new.level > old.level and uin.level >= new.level) or
+      (new.level < old.level)
+    )
+    |> select([uc, f, old, new, uin], uc.id)
+    |> Repo.exists?()
   end
 
   def list_integrities do

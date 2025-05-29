@@ -1,0 +1,21 @@
+meta {
+  name: Update integrity
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{host}}/files/:id/integrity
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: {{file_id}}
+}
+
+body:json {
+  {
+    "integrity": "Weak"
+  }
+}

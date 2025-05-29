@@ -11,7 +11,7 @@ defmodule BellFS.Accounts.User do
     field :certificate, :string
 
     field :password, :string, virtual: true, redact: true
-    field :hashed_password, :string
+    field :hashed_password, :string, redact: true
     field :totp_secret, :binary
 
     timestamps(type: :utc_datetime)

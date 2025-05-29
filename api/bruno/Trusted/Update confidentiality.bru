@@ -1,0 +1,21 @@
+meta {
+  name: Update confidentiality
+  type: http
+  seq: 1
+}
+
+put {
+  url: {{host}}/files/:id/confidentiality
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: {{file_id}}
+}
+
+body:json {
+  {
+    "confidentiality": "Normal"
+  }
+}

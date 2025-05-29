@@ -6,6 +6,7 @@ defmodule BellFS.Structure do
   alias BellFS.Accounts.User
   alias BellFS.Structure.File
 
+  alias BellFS.Security
   alias BellFS.Security.{
     Confidentiality,
     Integrity,
@@ -83,6 +84,24 @@ defmodule BellFS.Structure do
     current_user
     |> scoped_query(:update, id: id)
     |> Repo.exists?()
+  end
+
+  def set_file_confidentiality(%File{} = file, confidentiality_name) do
+    confidentiality = Security.get_confidentiality_by_name!(confidentiality_name)
+
+    file
+    |> File.changeset(%{confidentiality_id: confidentiality.id})
+    |> Repo.update()
+    |> Repo.preload_after_mutation(File.preloads())
+  end
+
+  def set_file_integrity(%File{} = file, integrity_name) do
+    integrity = Security.get_integrity_by_name!(integrity_name)
+
+    file
+    |> File.changeset(%{integrity_id: integrity.id})
+    |> Repo.update()
+    |> Repo.preload_after_mutation(File.preloads())
   end
 
   @doc """
