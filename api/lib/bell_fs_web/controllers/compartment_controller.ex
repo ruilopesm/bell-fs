@@ -13,8 +13,19 @@ defmodule BellFSWeb.CompartmentController do
     |> render(:show, compartments: compartments)
   end
 
-  def create(conn, %{"compartment" => params}) do
+  def create(conn, %{"compartment" => params, "users" => users}) do
     with {:ok, %Compartment{} = compartment} <- Security.create_compartment(params) do
+      # Create userCompartment for each user in users -> {username: "username", confidentiality: "confidentiality", integrity: "integrity"}
+      Enum.each(users, fn user_params ->
+        attrs = %{}
+        attrs = Map.put(attrs, "username", user_params["username"])
+        attrs = Map.put(attrs, "compartment_id", compartment.id)
+        attrs = Map.put(attrs, "trusted", true)
+        attrs = Map.put(attrs, "confidentiality_id", Security.get_confidentiality_by_name!(user_params["confidentiality"]).id)
+        attrs = Map.put(attrs, "integrity_id", Security.get_integrity_by_name!(user_params["integrity"]).id)
+
+        Security.add_user_to_compartment(attrs)
+      end)
       conn
       |> put_status(:created)
       |> render(:show, compartment: compartment)
