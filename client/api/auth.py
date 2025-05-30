@@ -23,10 +23,11 @@ class AsyncAuthAPIClient:
         }
 
     @api_call(expected_status=200, method='post')
-    async def _login(self, username, password):
+    async def _login(self, username, password, totp_code):
         return '/login', {
             'username': username,
             'password': password,
+            'totp_code': totp_code,
         }
 
     @api_call(expected_status=204, method='post')
@@ -44,8 +45,8 @@ class AsyncAuthAPIClient:
     async def register(self, username, password, certificate):
         return await self._register(username, password, certificate)
 
-    async def login(self, username, password):
-        response = await self._login(username, password)
+    async def login(self, username, password, totp_code):
+        response = await self._login(username, password, totp_code)
         body = response.json()
         self.username = body['user']['username']
         self.access_token = body['access_token']

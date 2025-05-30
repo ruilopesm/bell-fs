@@ -1,4 +1,5 @@
 import base64
+import traceback
 from json import dumps
 from functools import wraps
 from collections import OrderedDict
@@ -29,7 +30,7 @@ def api_call(expected_status: int, method: str):
                     'status_code': response.status_code,
                     'error': error_content
                 }))
-
+               
             return response
         return wrapper
     return decorator
@@ -62,7 +63,7 @@ def secure_api_call(expected_status: int, method: str):
 
             request_args = {
                 'headers': headers,
-                'params' if method.lower() == 'get' else 'json': payload
+                'params' if method.lower() in ['get', 'delete'] else 'json': payload
             }
 
             if request_func is None:
@@ -103,6 +104,7 @@ def safe_api_callback(error_title: str):
             except UnauthorizedAccessException as e:
                 self.notify(str(e), title='Unauthorized Access', severity='error', markup=False)
             except Exception as e:
+                self.notify(str(traceback.format_exc()), markup=False)
                 self.notify(str(e), title=error_title, severity='error', markup=False)
         return wrapper
     return decorator

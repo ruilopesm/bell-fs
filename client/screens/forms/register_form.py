@@ -1,3 +1,5 @@
+import webbrowser
+import traceback
 from textual.reactive import reactive
 from textual.message import Message
 from textual.app import ComposeResult
@@ -32,12 +34,14 @@ class RegisterForm(Static):
   
     async def handle_register(self):
         try:
-            await self.app.api.register(
+            response = await self.app.api.register(
                 self.username.value,
                 self.password.value,
                 self.certificate_path
             )
-            self.post_message(self.RegisterSuccess())
+            webbrowser.open_new_tab(response.json().get('totp_qr'))
             self.notify('Login to access BLP file system', title='Successful Registration')
+            self.post_message(self.RegisterSuccess())
         except Exception as e:
+            self.notify(str(traceback.format_exc()), markup=False)
             self.notify(str(e), title='Failed Registration', markup=False, severity='error')

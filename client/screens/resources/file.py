@@ -32,11 +32,11 @@ class File(HorizontalGroup):
         self.file_data = file_data 
 
     def compose(self) -> ComposeResult:
-        yield Label(self.file_data['compartment'], classes='text-label')
-        yield Label(self.file_data['filename'], classes='text-label')
+        yield Label(self.file_data['compartment']['name'], classes='text-label')
+        yield Label(self.file_data['name'], classes='text-label')
         with Horizontal(classes='button-group'):
-            yield Button('read', id='read', variant='primary', classes='button-of-group', disabled=(not self.file_data['permissions']['read']))
-            yield Button('write', id='write', variant='primary', classes='button-of-group', disabled=(not self.file_data['permissions']['write']))
+            yield Button('Read', id='read', variant='primary', classes='button-of-group', disabled=(not self.file_data['permissions']['read']))
+            yield Button('Write', id='write', variant='primary', classes='button-of-group', disabled=(not self.file_data['permissions']['update']))
             yield Button('Manage', id='manage', variant='primary', classes='button-of-group', disabled=(not self.file_data['permissions']['manage']))
             yield Button('Delete', id='delete', variant='error', classes='button-of-group', disabled=(not self.file_data['permissions']['delete']))
 

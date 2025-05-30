@@ -1,4 +1,5 @@
 import json
+import base64
 from api.decorators import safe_api_callback
 from textual.screen import Screen
 from textual.widgets import Footer
@@ -9,6 +10,7 @@ from screens.text.editor import EditorScreen
 from screens.forms.file_form import FileForm
 from screens.resources.file import File
 from screens.forms.manage_form  import ManageForm
+from screens.text.viewer import ViewerScreen
 
 
 class BLPFS(Screen):
@@ -18,11 +20,11 @@ class BLPFS(Screen):
         ('a', 'add_file', 'add file'),
         ('q', 'logout', 'logout'),
         ('m', 'me', 'me'),
+        ('r', 'reload', 'reload'),
     ]
 
-    current_directory = reactive(None)
-    current_directory_data = reactive(None)
-
+    files = reactive(None)
+    selected_file = reactive(None)
 
     def compose(self) -> ComposeResult:
         yield VerticalScroll(id='blpfs')
@@ -30,22 +32,19 @@ class BLPFS(Screen):
 
 
     async def on_mount(self) -> None:
-        with open('assets/blpfs.json') as file:
-            self.fs = json.load(file)
-            self.load_blpfs_widgets()
+        self.run_worker(self.load_blpfs(), exclusive=True)
 
 
     async def action_logout(self) -> None:
         self.run_worker(self.handle_logout(), exclusive=True)
 
+
     async def action_me(self) -> None:
         self.run_worker(self.handle_me(), exclusive=True)
 
 
-    async def action_add_file(self) -> None:
-        def handler(filename : str | None) -> None:
-            self.notify(str(filename))
-        self.app.push_screen(FileForm(), handler)
+    async def action_reload(self) -> None:
+        self.run_worker(self.load_blpfs(), exclusive=True)
 
 
     async def on_file_read(self, message: File.Read) -> None:
@@ -56,64 +55,74 @@ class BLPFS(Screen):
         self.run_worker(self.handle_file_write(message.resource_id), exclusive=True)
 
 
-    async def on_file_manage(self, message: File.Manage) -> None:
-        def handler(filename : str | None) -> None:
-            self.notify(str(filename))
-        self.app.push_screen(ManageForm(), handler)
-
-
-
     async def on_file_delete(self, message: File.Delete) -> None:
         self.run_worker(self.handle_file_delete(message.resource_id), exclusive=True)
 
 
-    @safe_api_callback('File Register Failed')
-    async def handle_file_form_dismiss(self, filename : str | None) -> None:
-        with open(filename, 'rb') as file:
-            response = await self.app.api.post_file_create(
-                filename.split('/')[-1],
-                file.read(),
-                self.current_directory)
-            if response.status_code != 201:
-                raise Exception(json.dumps(response.json()))
-            file_resource = File(
-                response.json().get('file').get('id'),
-                response.json().get('file').get('name'))
-            resources = self.query_one('#blpfs')
-            resources.mount(file_resource)
-            file_resource.scroll_visible()
+    async def action_add_file(self) -> None:
+        self.run_worker(self.handle_file_form(), exclusive=True)
+
+
+    def on_file_manage(self, message: File.Manage) -> None:
+        self.selected_file = message.resource_id
+        self.run_worker(self.handle_manage_form(), exclusive=True)
+
+
+    @safe_api_callback('Manage Form Failed')
+    async def handle_manage_form(self) -> None:
+        async def handler(result : dict | None) -> None:
+            if result['success']:
+                await self.handle_update_integrity(self.selected_file, result['integrity'])
+                await self.handle_update_confidentiality(self.selected_file, result['confidentiality'])
+                await self.load_blpfs()
+        self.app.push_screen(ManageForm(), handler)
+
+
+    @safe_api_callback('Update Integrity Failed')
+    async def handle_update_integrity(self, file_id, integrity) -> None:
+        await self.app.api.update_integrity(file_id, integrity)
+
+
+    @safe_api_callback('Update Confidentiality Failed')
+    async def handle_update_confidentiality(self, file_id, confidentiality) -> None:
+        await self.app.api.update_confidentiality(file_id, confidentiality)
+
+
+    @safe_api_callback('File Form Failed')
+    async def handle_file_form(self) -> None:
+        async def handler(filename : str | None) -> None:
+            if len(filename) > 0:
+                self.notify(filename, title='File Saved')
+            await self.load_blpfs()
+        self.app.push_screen(FileForm(), handler)
+
+
+    @safe_api_callback('Delete File Failed')
+    async def handle_file_delete(self, file_id: str) -> None:
+        await self.app.api.delete_file(file_id)
+        response = await self.app.api.get_files()
+        self.files = response.json().get('files')
+        self.load_blpfs_widgets()
 
 
     @safe_api_callback('Write File Failed')
     async def handle_file_write(self, file_id: str) -> None:
         async def handler(new_content : str | None) -> None:
-            write_response = await self.app.api.post_file_write(
-                file_id, body, new_content.encode('utf-8'))
-            if write_response.status_code != 200:
-                raise Exception(json.dumps(write_response.json()))
-        response = await self.app.api.get_file(file_id)
-        if response.status_code != 200:
-            raise Exception(json.dumps(response.json()))
+            await self.app.api.update_file_content(file_id, name, new_content)
+        response = await self.app.api.read_file(file_id)
         body = response.json()
         name = body['file']['name']
-        content = await self.app.api.get_file_content(body)
-        self.app.push_screen(EditorScreen(name, content.decode('utf-8')), handler)
+        content = body['file']['content']
+        self.app.push_screen(EditorScreen(name, content), handler)
 
 
-    @safe_api_callback('Delete File Failed')
-    async def handle_file_manage(self, file_id : str):
-        response = await self.app.api.delete_file(file_id)
-        if response.status_code != 204:
-            raise Exception(json.dumps(response.json()))
-        await self.load_blpfs()
-
-
-    @safe_api_callback('Delete File Failed')
-    async def handle_file_delete(self, file_id : str):
-        response = await self.app.api.delete_file(file_id)
-        if response.status_code != 204:
-            raise Exception(json.dumps(response.json()))
-        await self.load_blpfs()
+    @safe_api_callback('Read File Failed')
+    async def handle_file_read(self, file_id) -> None:
+        response = await self.app.api.read_file(file_id)
+        body = response.json()
+        name = body['file']['name']
+        content = body['file']['content']
+        self.app.push_screen(ViewerScreen(name, content))
 
 
     @safe_api_callback('Failed Logout')
@@ -123,22 +132,17 @@ class BLPFS(Screen):
         self.notify('Login again to access BLP file system', title='Successful Logout')
 
 
-    @safe_api_callback('Failed get ME')
+    @safe_api_callback('Failed Get ME')
     async def handle_me(self) -> None:
         response = await self.app.api.me()
         self.notify(json.dumps(response.json()), markup=False)
 
 
-    @safe_api_callback('Load Directory Failed')
+    @safe_api_callback('Load blpfs Failed')
     async def load_blpfs(self) -> None:
-        if self.current_directory == None:
-            response = await self.app.api.get_vault()
-        else:
-            response = await self.app.api.get_directory(self.current_directory)
-        if response.status_code != 200:
-            raise Exception(json.dumps(response.json()))
-        self.current_directory_data = response.json()
-        self.notify(json.dumps(self.current_directory_data), markup=False)
+        response = await self.app.api.get_files()
+        self.files = response.json().get('files')
+        self.notify(json.dumps(self.files), markup=False)
         self.load_blpfs_widgets()
 
 
@@ -146,5 +150,5 @@ class BLPFS(Screen):
         resources = self.query_one('#blpfs')
         resources.remove_children()
         resources._nodes._clear()
-        for file in self.fs:
+        for file in self.files:
             resources.mount(File(file))
