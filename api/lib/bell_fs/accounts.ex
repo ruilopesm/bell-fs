@@ -43,8 +43,7 @@ defmodule BellFS.Accounts do
   end
 
   defp maybe_authenticate_user(%User{} = user, password, totp_code) do
-    # totp_valid? = NimbleTOTP.valid?(user.totp_secret, totp_code)
-    totp_valid? = true
+    totp_valid? = NimbleTOTP.valid?(user.totp_secret, totp_code)
 
     if Argon2.verify_pass(password, user.hashed_password) && totp_valid? do
       {:ok, user}

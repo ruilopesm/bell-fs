@@ -1,11 +1,17 @@
-# Script for populating the database. You can run it as:
-#
-#     mix run priv/repo/seeds.exs
-#
-# Inside the script, you can read and write to any of your
-# repositories directly:
-#
-#     BellFS.Repo.insert!(%BellFS.SomeSchema{})
-#
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
+defmodule BellFS.Repo.Seeds do
+  @moduledoc false
+
+  @seeds_dir "priv/repo/seeds"
+
+  def run do
+    [
+      "levels.exs",
+      "compartments.exs"
+    ]
+    |> Enum.each(fn file ->
+      Code.require_file("#{@seeds_dir}/#{file}")
+    end)
+  end
+end
+
+BellFS.Repo.Seeds.run()
