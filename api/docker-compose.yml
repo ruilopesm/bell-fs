@@ -6,8 +6,28 @@ services:
     environment:
       POSTGRES_USER: ${DB_USERNAME:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-bell_fs_dev}
       POSTGRES_HOST: ${DB_HOST:-localhost}
     ports:
       - ${DB_PORT:-5432}:5432
+    network_mode: "host"
     volumes:
       - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USERNAME:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  web:
+    container_name: bell_fs_web
+    env_file: .env.dev
+    environment:
+      MIX_ENV: ${MIX_ENV:-dev}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    network_mode: "host"
+    depends_on:
+      - db

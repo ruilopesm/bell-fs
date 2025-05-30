@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+cd -P -- "$(dirname -- "$0")"
+
+./bell_fs eval BellFS.Release.migrate
+./bell_fs eval BellFS.Release.seed
+PHX_SERVER=true exec ./bell_fs start

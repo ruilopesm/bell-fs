@@ -10,7 +10,7 @@ defmodule BellFS.MixProject do
       app: @app,
       version: @version,
       description: @description,
-      elixir: "~> 1.18",
+      elixir: "~> 1.17",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),

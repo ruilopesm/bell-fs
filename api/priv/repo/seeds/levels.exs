@@ -9,7 +9,7 @@ defmodule BellFS.Repo.Seeds.Levels do
     "Unclassified",
     "Classified",
     "Secret",
-    "Top Secret"
+    "Top-Secret"
   ]
 
   @integrities [
